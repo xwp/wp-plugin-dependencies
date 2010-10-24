@@ -61,5 +61,5 @@ Make sure your host is running PHP 5. The only foolproof way to do this is to ad
 
 = 1.0 =
 * initial release
-* [more info](http://scribu.net/wordpress/plugin-dependencies/pd-0-5.html)
+* [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-0.html)
 
