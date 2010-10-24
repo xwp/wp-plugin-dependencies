@@ -1,0 +1,45 @@
+# Translation of the WordPress plugin Plugin Dependencies 1.0 by scribu.
+# Copyright (C) 2010 scribu
+# This file is distributed under the same license as the Plugin Dependencies package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugin Dependencies 1.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
+"POT-Creation-Date: 2010-10-24 22:10+0000\n"
+"PO-Revision-Date: 2010-10-25 01:12+0200\n"
+"Last-Translator: scribu <mail@scribu.net>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plugin-dependencies.php:136
+msgid "The following plugins have also been deactivated:"
+msgstr "Următoarele module au fost de asemnea dezactivate:"
+
+#: plugin-dependencies.php:202
+msgid "Required plugins:"
+msgstr "Module necesare:"
+
+#. Plugin Name of the plugin/theme
+msgid "Plugin Dependencies"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://scribu.net/wordpress/plugin-dependencies"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Prevent activating plugins that don't have all their dependencies satisfied"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "scribu"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://scribu.net/"
+msgstr ""
+
