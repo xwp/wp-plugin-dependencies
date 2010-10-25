@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Plugin Dependencies
-Version: 1.0
+Version: 1.0.1-alpha
 Description: Prevent activating plugins that don't have all their dependencies satisfied
 Author: scribu
 Author URI: http://scribu.net/
@@ -145,7 +145,9 @@ class Plugin_Dependencies {
 ?>
 <style type="text/css">
 .dep-list li { list-style: disc inside none }
-span.deps li { color: #BC0B0B }
+span.deps li.unsatisfied { color: red }
+span.deps li.unsatisfied_network { color: orange }
+span.deps li.satisfied { color: green }
 </style>
 <?php
 	}
@@ -188,33 +190,47 @@ jQuery(document).ready(function($) {
 		if ( empty( $deps ) )
 			return $actions;
 
-		$unsatisfied = array();
+		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
-			if ( !is_plugin_active( $dep ) && !is_plugin_active_for_network( $dep ) )
+			if ( !is_plugin_active( $dep ) )
 				$unsatisfied[] = $dep;
+
+			if ( !is_plugin_active_for_network( $dep ) )
+				$unsatisfied_network[] = $dep;
 		}
 
-		if ( empty( $unsatisfied ) )
-			return $actions;
+		if ( !empty( $unsatisfied ) ) {
+			unset( $actions['activate'] );
+		}
 
-		unset( $actions['activate'] );
+		if ( !empty( $unsatisfied_network ) ) {
+			unset( $actions['network_activate'] );
+		}
 
-		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies') . '<br>' . self::generate_dep_list( $unsatisfied );
+		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies') . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
 
 		return $actions;
 	}
 
-	private function generate_dep_list( $deps ) {
+	private function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
-			if ( isset( $all_plugins[$dep] ) && isset( $all_plugins[$dep]['Name'] ) )
-				$dep = html( 'a', array( 'href' => '#' . sanitize_title( $all_plugins[$dep]['Name'] ) ), $all_plugins[$dep]['Name'] );
-			else
-				$dep = html( 'span', esc_html( $dep ) );
+			$class = 'satisfied';
 
-			$dep_list .= html( 'li', $dep );
+			if ( in_array( $dep, $unsatisfied_network ) )
+				$class = 'unsatisfied_network';
+
+			if ( in_array( $dep, $unsatisfied ) )
+				$class = 'unsatisfied';
+
+			if ( isset( $all_plugins[$dep] ) && isset( $all_plugins[$dep]['Name'] ) )
+				$name = html( 'a', array( 'href' => '#' . sanitize_title( $all_plugins[$dep]['Name'] ) ), $all_plugins[$dep]['Name'] );
+			else
+				$name = html( 'span', esc_html( $dep ) );
+
+			$dep_list .= html( 'li', compact( 'class' ), $name );
 		}
 
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );

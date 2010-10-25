@@ -4,7 +4,7 @@ Donate link: http://scribu.net/wordpress
 Tags: plugin, dependency
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: trunk
+Stable tag: 1.0
 
 Plugin dependency management
 
