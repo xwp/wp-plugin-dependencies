@@ -34,7 +34,7 @@ Clarifications:
 * Each dependency is represented by a plugin basename.
 * A parent plugin can have dependencies of it's own.
 
-Links: [Plugin News](http://scribu.net/wordpress/front-end-editor) | [Author's Site](http://scribu.net)
+Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
 == Screenshots ==
 
