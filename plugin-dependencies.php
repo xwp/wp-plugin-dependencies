@@ -53,19 +53,19 @@ class Plugin_Dependencies {
 	private static $deactivate_cascade;
 
 	private function deactivate_cascade( $to_deactivate ) {
-		self::$active_plugins = scbUtil::array_extract( self::$dependencies, self::get_active_plugins() );
+		self::$active_plugins = self::get_active_plugins();
 		self::$deactivate_cascade = array();
 
 		self::_cascade( $to_deactivate );
-
-		deactivate_plugins( self::$deactivate_cascade );
 
 		set_transient( 'pd_deactivate_cascade', self::$deactivate_cascade );
 	}
 
 	private function _cascade( $to_deactivate ) {
 		$found = array();
-		foreach ( self::$dependencies as $dep => $deps ) {
+		foreach ( self::$active_plugins as $dep ) {
+			$deps = self::$dependencies[ $dep ];
+
 			if ( empty( $deps ) )
 				continue;
 
@@ -80,6 +80,8 @@ class Plugin_Dependencies {
 		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
 
 		self::_cascade( $found );
+
+		deactivate_plugins( $found );
 	}
 
 	function admin_notices() {
@@ -200,7 +202,7 @@ jQuery(document).ready(function($) {
 		$active = get_option( 'active_plugins', array() );
 
 		if ( is_multisite() )
-			$active = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+			$active = array_merge( $active, get_site_option( 'active_sitewide_plugins', array() ) );
 
 		return $active;
 	}
