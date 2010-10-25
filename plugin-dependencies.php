@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Plugin Dependencies
-Version: 1.0.1-alpha
+Version: 1.0.1
 Description: Prevent activating plugins that don't have all their dependencies satisfied
 Author: scribu
 Author URI: http://scribu.net/
@@ -101,7 +101,6 @@ class Plugin_Dependencies {
 
 		delete_transient( 'pd_deactivate_cascade' );
 	}
-
 
 	function admin_print_styles() {
 ?>

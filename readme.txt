@@ -4,7 +4,7 @@ Donate link: http://scribu.net/wordpress
 Tags: plugin, dependency
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: 1.0
+Stable tag: trunk
 
 Plugin dependency management
 
@@ -58,6 +58,10 @@ Make sure your host is running PHP 5. The only foolproof way to do this is to ad
 <br>
 
 == Changelog ==
+
+= 1.0.1 =
+* fixed critical bug when not running MultiSite
+* better network activation handling
 
 = 1.0 =
 * initial release
