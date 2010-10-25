@@ -28,6 +28,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Plugin_Dependencies {
 
+	private static $dependencies = array();
+
 	function init() {
 		add_action( 'load-plugins.php', array( __CLASS__, '_init' ) );
 		add_action( 'extra_plugin_headers', array( __CLASS__, 'extra_plugin_headers' ) );
@@ -36,6 +38,8 @@ class Plugin_Dependencies {
 
 	function _init() {
 		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
+
+		self::parse_dependencies();
 
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] )
 			self::deactivate_cascade( (array) $_REQUEST['plugin'] );
@@ -49,9 +53,7 @@ class Plugin_Dependencies {
 	private static $deactivate_cascade;
 
 	private function deactivate_cascade( $to_deactivate ) {
-		$hierarchy = self::get_dependency_hierarchy();
-
-		self::$active_plugins = self::get_dependency_parents();
+		self::$active_plugins = scbUtil::array_extract( self::$dependencies, self::get_active_plugins() );
 		self::$deactivate_cascade = array();
 
 		self::_cascade( $to_deactivate );
@@ -63,7 +65,7 @@ class Plugin_Dependencies {
 
 	private function _cascade( $to_deactivate ) {
 		$found = array();
-		foreach ( self::$active_plugins as $dep => $deps ) {
+		foreach ( self::$dependencies as $dep => $deps ) {
 			if ( empty( $deps ) )
 				continue;
 
@@ -78,48 +80,6 @@ class Plugin_Dependencies {
 		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
 
 		self::_cascade( $found );
-	}
-
-	// parent => children
-	private function get_dependency_hierarchy() {
-		$all_plugins = get_plugins();
-
-		$r = array();
-		foreach ( $all_plugins as $dep => $plugin_data ) {
-			foreach ( self::get_dependencies( $plugin_data ) as $parent )
-				$r[ $parent ][] = $dep;
-		}
-
-		return $r;
-	}
-
-	// child => parents
-	private function get_dependency_parents( $active = true ) {
-		if ( $active )
-			$plugins = self::get_active_plugins();
-		else
-			$plugins = get_plugins();
-
-		$r = array();
-		foreach ( $plugins as $dep => $plugin_data ) {
-			$r[ $dep ] = self::get_dependencies( $plugin_data );
-		}
-
-		return $r;
-	}
-
-	private function get_active_plugins() {
-		$all_plugins = get_plugins();
-
-		$active = array();
-		foreach ( $all_plugins as $dep => $plugin_data ) {
-			if ( !is_plugin_active( $dep ) && !is_plugin_active_for_network( $dep ) )
-				continue;
-
-			$active[ $dep ] = $plugin_data;
-		}
-
-		return $active;
 	}
 
 	function admin_notices() {
@@ -185,7 +145,7 @@ jQuery(document).ready(function($) {
 	}
 
 	function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
-		$deps = self::get_dependencies( $plugin_data );
+		$deps = self::$dependencies[ $plugin_file ];
 
 		if ( empty( $deps ) )
 			return $actions;
@@ -195,7 +155,7 @@ jQuery(document).ready(function($) {
 			if ( !is_plugin_active( $dep ) )
 				$unsatisfied[] = $dep;
 
-			if ( !is_plugin_active_for_network( $dep ) )
+			if ( is_multisite() && !is_plugin_active_for_network( $dep ) )
 				$unsatisfied_network[] = $dep;
 		}
 
@@ -236,15 +196,30 @@ jQuery(document).ready(function($) {
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
 	}
 
-	private function get_dependencies( $plugin_data ) {
-		if ( empty( $plugin_data['Dependencies'] ) )
-			return array();
+	private function get_active_plugins() {
+		$active = get_option( 'active_plugins', array() );
 
-		# http://core.trac.wordpress.org/attachment/ticket/15193/
-		if ( FALSE === strpos( $plugin_data['Dependencies'], '.php' ) )
-			return array();
+		if ( is_multisite() )
+			$active = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
 
-		return array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
+		return $active;
+	}
+
+	private function parse_dependencies() {
+		$all_plugins = get_plugins();
+		
+		foreach ( get_plugins() as $plugin => $plugin_data ) {
+			self::$dependencies[ $plugin ] = array();
+
+			if ( empty( $plugin_data['Dependencies'] ) )
+				continue;
+
+			# http://core.trac.wordpress.org/attachment/ticket/15193/
+			if ( FALSE === strpos( $plugin_data['Dependencies'], '.php' ) )
+				continue;
+
+			self::$dependencies[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
+		}
 	}
 }
 
