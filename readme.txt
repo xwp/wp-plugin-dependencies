@@ -3,7 +3,7 @@ Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: plugin, dependency
 Requires at least: 3.0
-Tested up to: 3.1-alpha
+Tested up to: 3.1-RC
 Stable tag: trunk
 
 Plugin dependency management
@@ -40,13 +40,6 @@ Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author'
 
 1. Activation prevention
 2. Cascade deactivation
-
-== Installation ==
-
-You can either use the built-in installer or do it manually:
-
-1. Unzip the "Plugin Dependencies" archive and put the folder into your plugins folder (/wp-content/plugins/).
-1. Activate the plugin from the Plugins menu.
 
 == Frequently Asked Questions ==
 
