@@ -26,70 +26,33 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-class Plugin_Dependencies {
 
-	private static $dependencies = array();
-	private static $provides = array();
+add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
+
+class Plugin_Dependencies_UI {
 
 	function init() {
-		add_action( 'load-plugins.php', array( __CLASS__, '_init' ) );
-		add_action( 'extra_plugin_headers', array( __CLASS__, 'extra_plugin_headers' ) );
-		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
-	}
+		Plugin_Dependencies::init();
 
-	function _init() {
 		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
-		self::parse_headers();
-
-		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] )
-			self::deactivate_cascade( (array) $_REQUEST['plugin'] );
+		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
 
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 		add_action( 'admin_footer', array( __CLASS__, 'admin_footer' ) );
-	}
 
-	private static $active_plugins;
-	private static $deactivate_cascade;
-
-	private function deactivate_cascade( $to_deactivate ) {
-		self::$active_plugins = self::get_active_plugins();
-		self::$deactivate_cascade = array();
-
-		self::_cascade( $to_deactivate );
-
-		set_transient( 'pd_deactivate_cascade', self::$deactivate_cascade );
-	}
-
-	private function _cascade( $to_deactivate ) {
-		$found = array();
-		foreach ( self::$active_plugins as $dep ) {
-			$deps = self::$dependencies[ $dep ];
-
-			if ( empty( $deps ) )
-				continue;
-
-			if ( count( array_intersect( $to_deactivate, $deps ) ) )
-				$found[] = $dep;
+		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
+			$deactivate_cascade = Plugin_Dependencies::deactivate_cascade( (array) $_REQUEST['plugin'] );
+			set_transient( 'pd_deactivate_cascade', $deactivate_cascade );
 		}
-
-		$found = array_diff( $found, self::$deactivate_cascade ); // prevent endless loop
-		if ( empty( $found ) )
-			return;
-
-		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
-
-		self::_cascade( $found );
-
-		deactivate_plugins( $found );
 	}
 
 	function admin_notices() {
 		if ( !isset( $_REQUEST['deactivate'] ) )
 			return;
 
-		$deactivate_cascade = get_transient('pd_deactivate_cascade');
+		$deactivate_cascade = get_transient( 'pd_deactivate_cascade' );
 
 		if ( empty( $deactivate_cascade ) )
 			return;
@@ -140,15 +103,8 @@ jQuery(document).ready(function($) {
 <?php
 	}
 
-	function extra_plugin_headers( $headers ) {
-		$headers['Dependencies'] = 'Dependencies';
-		$headers['Provides'] = 'Provides';
-
-		return $headers;
-	}
-
 	function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
-		$deps = self::$dependencies[ $plugin_file ];
+		$deps = Plugin_Dependencies::get_dependencies( $plugin_file );
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
 		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
@@ -158,7 +114,7 @@ jQuery(document).ready(function($) {
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
-			$plugin_ids = self::get_real_plugin_ids( $dep );
+			$plugin_ids = Plugin_Dependencies::get_real_plugin_ids( $dep );
 
 			if ( !count( array_intersect( $active_plugins, $plugin_ids ) ) )
 				$unsatisfied[] = $dep;
@@ -175,7 +131,7 @@ jQuery(document).ready(function($) {
 			unset( $actions['network_activate'] );
 		}
 
-		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies') . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies' ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
 
 		return $actions;
 	}
@@ -185,7 +141,7 @@ jQuery(document).ready(function($) {
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
-			$plugin_ids = self::get_real_plugin_ids( $dep );
+			$plugin_ids = Plugin_Dependencies::get_real_plugin_ids( $dep );
 
 			if ( in_array( $dep, $unsatisfied ) )
 				$class = 'unsatisfied';
@@ -210,6 +166,57 @@ jQuery(document).ready(function($) {
 
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
 	}
+}
+
+
+add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
+
+class Plugin_Dependencies {
+
+	private static $dependencies = array();
+	private static $provides = array();
+
+	private static $active_plugins;
+	private static $deactivate_cascade;
+
+	function extra_plugin_headers( $headers ) {
+		$headers['Dependencies'] = 'Dependencies';
+		$headers['Provides'] = 'Provides';
+
+		return $headers;
+	}
+
+	function init() {
+		$all_plugins = get_plugins();
+
+		foreach ( get_plugins() as $plugin => $plugin_data ) {
+			# http://core.trac.wordpress.org/attachment/ticket/15193/
+			self::$dependencies[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
+
+			self::$provides[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Provides'] ) );
+			self::$provides[ $plugin ][] = $plugin;
+		}
+	}
+
+	/**
+	 * Get a list of real or virtual dependencies for a plugin
+	 *
+	 * @param string $plugin_id A plugin basename
+	 * @return array List of dependencies
+	 */
+	public function get_dependencies( $plugin_id ) {
+		return self::$dependencies[ $plugin_id ];
+	}
+
+	/**
+	 * Get a list of dependencies provided by a certain plugin
+	 *
+	 * @param string $plugin_id A plugin basename
+	 * @return array List of dependencies
+	 */
+	public function get_provides( $plugin_id ) {
+		return self::$provides[ $plugin_id ];
+	}
 
 	/**
 	 * Get a list of plugins that provide a certain dependency
@@ -217,7 +224,7 @@ jQuery(document).ready(function($) {
 	 * @param string $dep Real or virtual dependency
 	 * @return array List of plugin ids
 	 */
-	private function get_real_plugin_ids( $dep ) {
+	public function get_real_plugin_ids( $dep ) {
 		$plugin_ids = array();
 
 		if ( isset( self::$provides[ $dep ] ) ) {
@@ -234,6 +241,48 @@ jQuery(document).ready(function($) {
 		return $plugin_ids;
 	}
 
+	/**
+	 * Deactivate plugins that would have unmet dependencies
+	 *
+	 * @param array $plugin_ids A list of plugin basenames
+	 * @return array List of deactivated plugins
+	 */
+	public function deactivate_cascade( $to_deactivate ) {
+		self::$active_plugins = self::get_active_plugins();
+		self::$deactivate_cascade = array();
+
+		self::_cascade( $to_deactivate );
+
+		return self::$deactivate_cascade;
+	}
+
+	private function _cascade( $to_deactivate ) {
+		$to_deactivate_deps = array();
+		foreach ( $to_deactivate as $plugin_id )
+			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provides( $plugin_id ) );
+
+		$found = array();
+		foreach ( self::$active_plugins as $dep ) {
+			$deps = self::$dependencies[ $dep ];
+
+			if ( empty( $deps ) )
+				continue;
+
+			if ( count( array_intersect( $to_deactivate_deps, $deps ) ) )
+				$found[] = $dep;
+		}
+
+		$found = array_diff( $found, self::$deactivate_cascade ); // prevent endless loop
+		if ( empty( $found ) )
+			return;
+
+		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
+
+		self::_cascade( $found );
+
+		deactivate_plugins( $found );
+	}
+
 	private function get_active_plugins() {
 		$active = get_option( 'active_plugins', array() );
 
@@ -242,21 +291,8 @@ jQuery(document).ready(function($) {
 
 		return $active;
 	}
-
-	private function parse_headers() {
-		$all_plugins = get_plugins();
-
-		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			# http://core.trac.wordpress.org/attachment/ticket/15193/
-			self::$dependencies[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
-
-			self::$provides[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Provides'] ) );
-			self::$provides[ $plugin ][] = $plugin;
-		}
-	}
 }
 
-Plugin_Dependencies::init();
 
 if ( ! function_exists( 'html' ) ):
 function html( $tag ) {
