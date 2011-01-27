@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Plugin Dependencies
-Version: 1.0.1
+Version: 1.1-alpha
 Description: Prevent activating plugins that don't have all their dependencies satisfied
 Author: scribu
 Author URI: http://scribu.net/
@@ -29,6 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 class Plugin_Dependencies {
 
 	private static $dependencies = array();
+	private static $provides = array();
 
 	function init() {
 		add_action( 'load-plugins.php', array( __CLASS__, '_init' ) );
@@ -39,7 +40,7 @@ class Plugin_Dependencies {
 	function _init() {
 		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
-		self::parse_dependencies();
+		self::parse_headers();
 
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] )
 			self::deactivate_cascade( (array) $_REQUEST['plugin'] );
@@ -93,7 +94,7 @@ class Plugin_Dependencies {
 		if ( empty( $deactivate_cascade ) )
 			return;
 
-		echo 
+		echo
 		html( 'div', array( 'class' => 'updated' ), html( 'p',
 			__( 'The following plugins have also been deactivated:', 'plugin-dependencies' ),
 			self::generate_dep_list( $deactivate_cascade )
@@ -141,6 +142,7 @@ jQuery(document).ready(function($) {
 
 	function extra_plugin_headers( $headers ) {
 		$headers['Dependencies'] = 'Dependencies';
+		$headers['Provides'] = 'Provides';
 
 		return $headers;
 	}
@@ -148,15 +150,20 @@ jQuery(document).ready(function($) {
 	function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$deps = self::$dependencies[ $plugin_file ];
 
+		$active_plugins = (array) get_option( 'active_plugins', array() );
+		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
+
 		if ( empty( $deps ) )
 			return $actions;
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
-			if ( !is_plugin_active( $dep ) )
+			$plugin_ids = self::get_real_plugin_ids( $dep );
+
+			if ( !count( array_intersect( $active_plugins, $plugin_ids ) ) )
 				$unsatisfied[] = $dep;
 
-			if ( is_multisite() && !is_plugin_active_for_network( $dep ) )
+			if ( is_multisite() && !count( array_intersect( $network_active_plugins, $plugin_ids ) ) )
 				$unsatisfied_network[] = $dep;
 		}
 
@@ -178,23 +185,53 @@ jQuery(document).ready(function($) {
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
-			$class = 'satisfied';
-
-			if ( in_array( $dep, $unsatisfied_network ) )
-				$class = 'unsatisfied_network';
+			$plugin_ids = self::get_real_plugin_ids( $dep );
 
 			if ( in_array( $dep, $unsatisfied ) )
 				$class = 'unsatisfied';
-
-			if ( isset( $all_plugins[$dep] ) && isset( $all_plugins[$dep]['Name'] ) )
-				$name = html( 'a', array( 'href' => '#' . sanitize_title( $all_plugins[$dep]['Name'] ) ), $all_plugins[$dep]['Name'] );
+			elseif ( in_array( $dep, $unsatisfied_network ) )
+				$class = 'unsatisfied_network';
 			else
+				$class = 'satisfied';
+
+			if ( empty( $plugin_ids ) ) {
 				$name = html( 'span', esc_html( $dep ) );
+			} else {
+				$list = array();
+				foreach ( $plugin_ids as $plugin_id ) {
+					$name = isset( $all_plugins[ $plugin_id ]['Name'] ) ? $all_plugins[ $plugin_id ]['Name'] : $plugin_id;
+					$list[] = html( 'a', array( 'href' => '#' . sanitize_title( $name ) ), $name );
+				}
+				$name = implode( ' or ', $list );
+			}
 
 			$dep_list .= html( 'li', compact( 'class' ), $name );
 		}
 
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
+	}
+
+	/**
+	 * Get a list of plugins that provide a certain dependency
+	 *
+	 * @param string $dep Real or virtual dependency
+	 * @return array List of plugin ids
+	 */
+	private function get_real_plugin_ids( $dep ) {
+		$plugin_ids = array();
+
+		if ( isset( self::$provides[ $dep ] ) ) {
+			$plugin_ids = array( $dep );
+		} else {
+			// virtual dependency
+			foreach ( self::$provides as $plugin => $provides ) {
+				if ( in_array( $dep, $provides ) ) {
+					$plugin_ids[] = $plugin;
+				}
+			}
+		}
+
+		return $plugin_ids;
 	}
 
 	private function get_active_plugins() {
@@ -206,20 +243,15 @@ jQuery(document).ready(function($) {
 		return $active;
 	}
 
-	private function parse_dependencies() {
+	private function parse_headers() {
 		$all_plugins = get_plugins();
-		
+
 		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			self::$dependencies[ $plugin ] = array();
-
-			if ( empty( $plugin_data['Dependencies'] ) )
-				continue;
-
 			# http://core.trac.wordpress.org/attachment/ticket/15193/
-			if ( FALSE === strpos( $plugin_data['Dependencies'], '.php' ) )
-				continue;
-
 			self::$dependencies[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
+
+			self::$provides[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Provides'] ) );
+			self::$provides[ $plugin ][] = $plugin;
 		}
 	}
 }
