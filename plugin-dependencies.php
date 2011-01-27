@@ -114,7 +114,7 @@ jQuery(document).ready(function($) {
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
-			$plugin_ids = Plugin_Dependencies::get_real_plugin_ids( $dep );
+			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
 			if ( !count( array_intersect( $active_plugins, $plugin_ids ) ) )
 				$unsatisfied[] = $dep;
@@ -141,7 +141,7 @@ jQuery(document).ready(function($) {
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
-			$plugin_ids = Plugin_Dependencies::get_real_plugin_ids( $dep );
+			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
 			if ( in_array( $dep, $unsatisfied ) )
 				$class = 'unsatisfied';
@@ -214,7 +214,7 @@ class Plugin_Dependencies {
 	 * @param string $plugin_id A plugin basename
 	 * @return array List of dependencies
 	 */
-	public function get_provides( $plugin_id ) {
+	public function get_provided( $plugin_id ) {
 		return self::$provides[ $plugin_id ];
 	}
 
@@ -222,9 +222,9 @@ class Plugin_Dependencies {
 	 * Get a list of plugins that provide a certain dependency
 	 *
 	 * @param string $dep Real or virtual dependency
-	 * @return array List of plugin ids
+	 * @return array List of plugins
 	 */
-	public function get_real_plugin_ids( $dep ) {
+	public function get_providers( $dep ) {
 		$plugin_ids = array();
 
 		if ( isset( self::$provides[ $dep ] ) ) {
@@ -259,7 +259,7 @@ class Plugin_Dependencies {
 	private function _cascade( $to_deactivate ) {
 		$to_deactivate_deps = array();
 		foreach ( $to_deactivate as $plugin_id )
-			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provides( $plugin_id ) );
+			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
 
 		$found = array();
 		foreach ( self::$active_plugins as $dep ) {
