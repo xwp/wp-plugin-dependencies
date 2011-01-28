@@ -31,39 +31,55 @@ add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
 
 class Plugin_Dependencies_UI {
 
+	private static $msg;
+
 	function init() {
-		Plugin_Dependencies::init();
-
-		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
-
-		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
-
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 		add_action( 'admin_footer', array( __CLASS__, 'admin_footer' ) );
 
-		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
-			$deactivate_cascade = Plugin_Dependencies::deactivate_cascade( (array) $_REQUEST['plugin'] );
-			set_transient( 'pd_deactivate_cascade', $deactivate_cascade );
+		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
+
+		Plugin_Dependencies::init();
+
+		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
+
+		self::$msg = array(
+			array( 'deactivate', 'cascade', __( 'The following plugins have also been deactivated:', 'plugin-dependencies' ) ),
+			array( 'activate', 'conflicting', __( 'The following plugins have been deactivated due to dependency conflicts:', 'plugin-dependencies' ) ),
+		);
+
+		if ( !isset( $_REQUEST['action'] ) )
+			return;
+
+		foreach ( self::$msg as $args ) {
+			list( $action, $type ) = $args;
+
+			if ( $action == $_REQUEST['action'] ) {
+				$deactivated = call_user_func( array( 'Plugin_Dependencies', "deactivate_$type" ), (array) $_REQUEST['plugin'] );
+				set_transient( "pd_deactivate_$type", $deactivated );
+			}
 		}
 	}
 
 	function admin_notices() {
-		if ( !isset( $_REQUEST['deactivate'] ) )
-			return;
+		foreach ( self::$msg as $args ) {
+			list( $action, $type, $text ) = $args;
 
-		$deactivate_cascade = get_transient( 'pd_deactivate_cascade' );
+			if ( !isset( $_REQUEST[ $action ] ) )
+				continue;
 
-		if ( empty( $deactivate_cascade ) )
-			return;
+			$deactivated = get_transient( "pd_deactivate_$type" );
+			delete_transient( "pd_deactivate_$type" );
 
-		echo
-		html( 'div', array( 'class' => 'updated' ), html( 'p',
-			__( 'The following plugins have also been deactivated:', 'plugin-dependencies' ),
-			self::generate_dep_list( $deactivate_cascade )
-		) );
+			if ( empty( $deactivated ) )
+				continue;
 
-		delete_transient( 'pd_deactivate_cascade' );
+			echo
+			html( 'div', array( 'class' => 'updated' ),
+				html( 'p', $text, self::generate_dep_list( $deactivated ) )
+			);
+		}
 	}
 
 	function admin_print_styles() {
@@ -178,6 +194,7 @@ class Plugin_Dependencies {
 
 	private static $active_plugins;
 	private static $deactivate_cascade;
+	private static $deactivate_conflicting;
 
 	function extra_plugin_headers( $headers ) {
 		$headers['Dependencies'] = 'Dependencies';
@@ -242,13 +259,48 @@ class Plugin_Dependencies {
 	}
 
 	/**
+	 * Deactivate plugins that would provide the same dependencies as the ones in the list
+	 *
+	 * @param array $plugin_ids A list of plugin basenames
+	 * @return array List of deactivated plugins
+	 */
+	public function deactivate_conflicting( $to_activate ) {
+		$deps = array();
+		foreach ( $to_activate as $plugin_id ) {
+			$deps = array_merge( $deps, self::get_provided( $plugin_id ) );
+		}
+
+		$conflicting = array();
+
+		$to_check = array_diff( get_option( 'active_plugins', array() ), $to_activate );	// precaution
+
+		foreach ( $to_check as $active_plugin ) {
+			$common = array_intersect( $deps, self::get_provided( $active_plugin ) );
+
+			if ( !empty( $common ) )
+				$conflicting[] = $active_plugin;
+		}
+
+		// TODO: don't deactivate plugins that would still have all dependencies satisfied
+		$deactivated = self::deactivate_cascade( $conflicting );
+
+		deactivate_plugins( $conflicting );
+
+		return array_merge( $conflicting, $deactivated );
+	}
+
+	/**
 	 * Deactivate plugins that would have unmet dependencies
 	 *
 	 * @param array $plugin_ids A list of plugin basenames
 	 * @return array List of deactivated plugins
 	 */
 	public function deactivate_cascade( $to_deactivate ) {
-		self::$active_plugins = self::get_active_plugins();
+		self::$active_plugins = get_option( 'active_plugins', array() );
+
+		if ( is_multisite() )
+			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+
 		self::$deactivate_cascade = array();
 
 		self::_cascade( $to_deactivate );
@@ -281,15 +333,6 @@ class Plugin_Dependencies {
 		self::_cascade( $found );
 
 		deactivate_plugins( $found );
-	}
-
-	private function get_active_plugins() {
-		$active = get_option( 'active_plugins', array() );
-
-		if ( is_multisite() )
-			$active = array_merge( $active, get_site_option( 'active_sitewide_plugins', array() ) );
-
-		return $active;
 	}
 }
 
