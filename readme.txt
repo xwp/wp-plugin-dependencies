@@ -19,7 +19,7 @@ Example:
 `
 /*
 Plugin Name: Child Plugin
-Dependencies: parent-plugin/parent-plugin.php another-plugin.php
+Depends: parent-plugin/parent-plugin.php, another-plugin.php
 */
 `
 
@@ -28,11 +28,27 @@ What this does:
 * Disables activation of *Child Plugin* until both *Parent Plugin* and *Another Plugin* are already activated.
 * When either *Parent Plugin* or *Another Plugin* are deactivated, *Child Plugin* will also be deactivated.
 
-Clarifications:
+**Defining virtual packages**
 
-* Dependencies are separated by spaces.
-* Each dependency is represented by a plugin basename.
-* A parent plugin can have dependencies of it's own.
+Say you have a plugin with useful functions:
+
+`
+/*
+Plugin Name: Lib X
+Provides: lib-x
+*/
+`
+
+Now, dependant plugins can specify 'lib-x' as a dependency:
+
+`
+/*
+Plugin Name: Cool Plugin
+Depends: lib-x
+*/
+`
+
+Besides being shorter and more robust, the *Provides:* header allows multiple plugins to implement the same set of functionality and be used interchangeably.
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
