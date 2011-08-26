@@ -32,8 +32,6 @@ if ( !is_admin() )
 add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
 
 class Plugin_Dependencies {
-	const SEP = '/,\s*/';
-
 	private static $dependencies = array();
 	private static $provides = array();
 
@@ -52,11 +50,15 @@ class Plugin_Dependencies {
 		$all_plugins = get_plugins();
 
 		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			self::$dependencies[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Depends'] ) );
+			self::$dependencies[ $plugin ] = self::parse_field( $plugin_data['Depends'] );
 
-			self::$provides[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Provides'] ) );
+			self::$provides[ $plugin ] = self::parse_field( $plugin_data['Provides'] );
 			self::$provides[ $plugin ][] = $plugin;
 		}
+	}
+
+	private function parse_field( $str ) {
+		return array_filter( preg_split( '/,\s*/', $str ) );
 	}
 
 	/**
