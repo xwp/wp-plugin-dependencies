@@ -26,6 +26,160 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+if ( !is_admin() )
+	return;
+
+add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
+
+class Plugin_Dependencies {
+	const SEP = '/,\s*/';
+
+	private static $dependencies = array();
+	private static $provides = array();
+
+	private static $active_plugins;
+	private static $deactivate_cascade;
+	private static $deactivate_conflicting;
+
+	function extra_plugin_headers( $headers ) {
+		$headers['Provides'] = 'Provides';
+		$headers['Depends'] = 'Depends';
+
+		return $headers;
+	}
+
+	function init() {
+		$all_plugins = get_plugins();
+
+		foreach ( get_plugins() as $plugin => $plugin_data ) {
+			self::$dependencies[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Depends'] ) );
+
+			self::$provides[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Provides'] ) );
+			self::$provides[ $plugin ][] = $plugin;
+		}
+	}
+
+	/**
+	 * Get a list of real or virtual dependencies for a plugin
+	 *
+	 * @param string $plugin_id A plugin basename
+	 * @return array List of dependencies
+	 */
+	public function get_dependencies( $plugin_id ) {
+		return self::$dependencies[ $plugin_id ];
+	}
+
+	/**
+	 * Get a list of dependencies provided by a certain plugin
+	 *
+	 * @param string $plugin_id A plugin basename
+	 * @return array List of dependencies
+	 */
+	public function get_provided( $plugin_id ) {
+		return self::$provides[ $plugin_id ];
+	}
+
+	/**
+	 * Get a list of plugins that provide a certain dependency
+	 *
+	 * @param string $dep Real or virtual dependency
+	 * @return array List of plugins
+	 */
+	public function get_providers( $dep ) {
+		$plugin_ids = array();
+
+		if ( isset( self::$provides[ $dep ] ) ) {
+			$plugin_ids = array( $dep );
+		} else {
+			// virtual dependency
+			foreach ( self::$provides as $plugin => $provides ) {
+				if ( in_array( $dep, $provides ) ) {
+					$plugin_ids[] = $plugin;
+				}
+			}
+		}
+
+		return $plugin_ids;
+	}
+
+	/**
+	 * Deactivate plugins that would provide the same dependencies as the ones in the list
+	 *
+	 * @param array $plugin_ids A list of plugin basenames
+	 * @return array List of deactivated plugins
+	 */
+	public function deactivate_conflicting( $to_activate ) {
+		$deps = array();
+		foreach ( $to_activate as $plugin_id ) {
+			$deps = array_merge( $deps, self::get_provided( $plugin_id ) );
+		}
+
+		$conflicting = array();
+
+		$to_check = array_diff( get_option( 'active_plugins', array() ), $to_activate );	// precaution
+
+		foreach ( $to_check as $active_plugin ) {
+			$common = array_intersect( $deps, self::get_provided( $active_plugin ) );
+
+			if ( !empty( $common ) )
+				$conflicting[] = $active_plugin;
+		}
+
+		// TODO: don't deactivate plugins that would still have all dependencies satisfied
+		$deactivated = self::deactivate_cascade( $conflicting );
+
+		deactivate_plugins( $conflicting );
+
+		return array_merge( $conflicting, $deactivated );
+	}
+
+	/**
+	 * Deactivate plugins that would have unmet dependencies
+	 *
+	 * @param array $plugin_ids A list of plugin basenames
+	 * @return array List of deactivated plugins
+	 */
+	public function deactivate_cascade( $to_deactivate ) {
+		self::$active_plugins = get_option( 'active_plugins', array() );
+
+		if ( is_multisite() )
+			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+
+		self::$deactivate_cascade = array();
+
+		self::_cascade( $to_deactivate );
+
+		return self::$deactivate_cascade;
+	}
+
+	private function _cascade( $to_deactivate ) {
+		$to_deactivate_deps = array();
+		foreach ( $to_deactivate as $plugin_id )
+			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
+
+		$found = array();
+		foreach ( self::$active_plugins as $dep ) {
+			$deps = self::$dependencies[ $dep ];
+
+			if ( empty( $deps ) )
+				continue;
+
+			if ( count( array_intersect( $to_deactivate_deps, $deps ) ) )
+				$found[] = $dep;
+		}
+
+		$found = array_diff( $found, self::$deactivate_cascade ); // prevent endless loop
+		if ( empty( $found ) )
+			return;
+
+		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
+
+		self::_cascade( $found );
+
+		deactivate_plugins( $found );
+	}
+}
+
 
 add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
 
@@ -180,158 +334,6 @@ jQuery(document).ready(function($) {
 		}
 
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
-	}
-}
-
-
-add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
-
-class Plugin_Dependencies {
-	const SEP = '/,\s*/';
-
-	private static $dependencies = array();
-	private static $provides = array();
-
-	private static $active_plugins;
-	private static $deactivate_cascade;
-	private static $deactivate_conflicting;
-
-	function extra_plugin_headers( $headers ) {
-		$headers['Provides'] = 'Provides';
-		$headers['Depends'] = 'Depends';
-
-		return $headers;
-	}
-
-	function init() {
-		$all_plugins = get_plugins();
-
-		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			self::$dependencies[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Depends'] ) );
-
-			self::$provides[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Provides'] ) );
-			self::$provides[ $plugin ][] = $plugin;
-		}
-	}
-
-	/**
-	 * Get a list of real or virtual dependencies for a plugin
-	 *
-	 * @param string $plugin_id A plugin basename
-	 * @return array List of dependencies
-	 */
-	public function get_dependencies( $plugin_id ) {
-		return self::$dependencies[ $plugin_id ];
-	}
-
-	/**
-	 * Get a list of dependencies provided by a certain plugin
-	 *
-	 * @param string $plugin_id A plugin basename
-	 * @return array List of dependencies
-	 */
-	public function get_provided( $plugin_id ) {
-		return self::$provides[ $plugin_id ];
-	}
-
-	/**
-	 * Get a list of plugins that provide a certain dependency
-	 *
-	 * @param string $dep Real or virtual dependency
-	 * @return array List of plugins
-	 */
-	public function get_providers( $dep ) {
-		$plugin_ids = array();
-
-		if ( isset( self::$provides[ $dep ] ) ) {
-			$plugin_ids = array( $dep );
-		} else {
-			// virtual dependency
-			foreach ( self::$provides as $plugin => $provides ) {
-				if ( in_array( $dep, $provides ) ) {
-					$plugin_ids[] = $plugin;
-				}
-			}
-		}
-
-		return $plugin_ids;
-	}
-
-	/**
-	 * Deactivate plugins that would provide the same dependencies as the ones in the list
-	 *
-	 * @param array $plugin_ids A list of plugin basenames
-	 * @return array List of deactivated plugins
-	 */
-	public function deactivate_conflicting( $to_activate ) {
-		$deps = array();
-		foreach ( $to_activate as $plugin_id ) {
-			$deps = array_merge( $deps, self::get_provided( $plugin_id ) );
-		}
-
-		$conflicting = array();
-
-		$to_check = array_diff( get_option( 'active_plugins', array() ), $to_activate );	// precaution
-
-		foreach ( $to_check as $active_plugin ) {
-			$common = array_intersect( $deps, self::get_provided( $active_plugin ) );
-
-			if ( !empty( $common ) )
-				$conflicting[] = $active_plugin;
-		}
-
-		// TODO: don't deactivate plugins that would still have all dependencies satisfied
-		$deactivated = self::deactivate_cascade( $conflicting );
-
-		deactivate_plugins( $conflicting );
-
-		return array_merge( $conflicting, $deactivated );
-	}
-
-	/**
-	 * Deactivate plugins that would have unmet dependencies
-	 *
-	 * @param array $plugin_ids A list of plugin basenames
-	 * @return array List of deactivated plugins
-	 */
-	public function deactivate_cascade( $to_deactivate ) {
-		self::$active_plugins = get_option( 'active_plugins', array() );
-
-		if ( is_multisite() )
-			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-
-		self::$deactivate_cascade = array();
-
-		self::_cascade( $to_deactivate );
-
-		return self::$deactivate_cascade;
-	}
-
-	private function _cascade( $to_deactivate ) {
-		$to_deactivate_deps = array();
-		foreach ( $to_deactivate as $plugin_id )
-			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
-
-		$found = array();
-		foreach ( self::$active_plugins as $dep ) {
-			$deps = self::$dependencies[ $dep ];
-
-			if ( empty( $deps ) )
-				continue;
-
-			if ( count( array_intersect( $to_deactivate_deps, $deps ) ) )
-				$found[] = $dep;
-		}
-
-		$found = array_diff( $found, self::$deactivate_cascade ); // prevent endless loop
-		if ( empty( $found ) )
-			return;
-
-		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
-
-		self::_cascade( $found );
-
-		deactivate_plugins( $found );
 	}
 }
 
