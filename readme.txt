@@ -2,8 +2,8 @@
 Contributors: scribu
 Donate link: http://scribu.net/wordpress
 Tags: plugin, dependency
-Requires at least: 3.0
-Tested up to: 3.1-RC
+Requires at least: 3.1
+Tested up to: 3.2
 Stable tag: trunk
 
 Plugin dependency management

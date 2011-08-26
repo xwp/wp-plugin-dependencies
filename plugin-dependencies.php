@@ -10,7 +10,7 @@ Text Domain: plugin-dependencies
 Domain Path: /lang
 
 
-Copyright (C) 2010 Cristi Burcă (scribu@gmail.com)
+Copyright (C) 2010-2011 Cristi Burcă (scribu@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -93,7 +93,6 @@ span.deps li.satisfied { color: green }
 <?php
 	}
 
-	# http://core.trac.wordpress.org/changeset/15944
 	function admin_footer() {
 		$all_plugins = get_plugins();
 
@@ -188,6 +187,7 @@ jQuery(document).ready(function($) {
 add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
 
 class Plugin_Dependencies {
+	const SEP = '/,\s*/';
 
 	private static $dependencies = array();
 	private static $provides = array();
@@ -197,8 +197,8 @@ class Plugin_Dependencies {
 	private static $deactivate_conflicting;
 
 	function extra_plugin_headers( $headers ) {
-		$headers['Dependencies'] = 'Dependencies';
 		$headers['Provides'] = 'Provides';
+		$headers['Depends'] = 'Depends';
 
 		return $headers;
 	}
@@ -207,10 +207,9 @@ class Plugin_Dependencies {
 		$all_plugins = get_plugins();
 
 		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			# http://core.trac.wordpress.org/attachment/ticket/15193/
-			self::$dependencies[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Dependencies'] ) );
+			self::$dependencies[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Depends'] ) );
 
-			self::$provides[ $plugin ] = array_filter( preg_split( '/\s+/', $plugin_data['Provides'] ) );
+			self::$provides[ $plugin ] = array_filter( preg_split( self::SEP, $plugin_data['Provides'] ) );
 			self::$provides[ $plugin ][] = $plugin;
 		}
 	}
@@ -347,13 +346,23 @@ function html( $tag ) {
 		$closing = $tag;
 		$attributes = array_shift( $args );
 		foreach ( $attributes as $key => $value ) {
-			$tag .= ' ' . $key . '="' . htmlspecialchars( $value, ENT_QUOTES ) . '"';
+			if ( false === $value )
+				continue;
+
+			if ( true === $value )
+				$value = $key;
+
+			$tag .= ' ' . $key . '="' . esc_attr( $value ) . '"';
 		}
 	} else {
-		list( $closing ) = explode(' ', $tag, 2);
+		list( $closing ) = explode( ' ', $tag, 2 );
 	}
 
-	$content = implode('', $args);
+	if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ) ) ) {
+		return "<{$tag} />";
+	}
+
+	$content = implode( '', $args );
 
 	return "<{$tag}>{$content}</{$closing}>";
 }
