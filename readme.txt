@@ -66,7 +66,16 @@ Make sure your host is running PHP 5. The only foolproof way to do this is to ad
 `var_dump(PHP_VERSION);`
 <br>
 
+= Can I have grand-child plugins? =
+
+Yes, the dependency chain can go as deep as you want.
+
 == Changelog ==
+
+= 1.1 =
+* added 'Provides:' header
+* replaced 'Dependencies:' with 'Depends:'
+* [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-1.html)
 
 = 1.0.1 =
 * fixed critical bug when not running MultiSite
