@@ -161,12 +161,8 @@ class Plugin_Dependencies {
 
 		$found = array();
 		foreach ( self::$active_plugins as $dep ) {
-			$deps = self::$dependencies[ $dep ];
-
-			if ( empty( $deps ) )
-				continue;
-
-			if ( count( array_intersect( $to_deactivate_deps, $deps ) ) )
+			$matching_deps = array_intersect( $to_deactivate_deps, self::get_dependencies( $dep ) );
+			if ( !empty( $matching_deps ) )
 				$found[] = $dep;
 		}
 
