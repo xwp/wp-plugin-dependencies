@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Plugin Dependencies
-Version: 1.1
+Version: 1.1.1-alpha
 Description: Prevent activating plugins that don't have all their dependencies satisfied
 Author: scribu
 Author URI: http://scribu.net/
@@ -142,6 +142,9 @@ class Plugin_Dependencies {
 	 * @return array List of deactivated plugins
 	 */
 	public function deactivate_cascade( $to_deactivate ) {
+		if ( empty( $to_deactivate ) )
+			return array();
+
 		self::$active_plugins = get_option( 'active_plugins', array() );
 
 		if ( is_multisite() )
