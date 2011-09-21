@@ -191,7 +191,7 @@ class Plugin_Dependencies_UI {
 	function init() {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
-		add_action( 'admin_footer', array( __CLASS__, 'admin_footer' ) );
+		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
 
 		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
 
@@ -248,7 +248,7 @@ span.deps li.satisfied { color: green }
 <?php
 	}
 
-	function admin_footer() {
+	function footer_script() {
 		$all_plugins = get_plugins();
 
 		$hash = array();
@@ -259,7 +259,7 @@ span.deps li.satisfied { color: green }
 
 ?>
 <script type="text/javascript">
-jQuery(document).ready(function($) {
+jQuery(function($) {
 	var hash = <?php echo json_encode( $hash ); ?>
 
 	$('table.widefat tbody tr').not('.second').each(function() {
