@@ -263,8 +263,7 @@ jQuery(function($) {
 	var hash = <?php echo json_encode( $hash ); ?>
 
 	$('table.widefat tbody tr').not('.second').each(function() {
-		var $self = $(this),
-			title = $self.find('.plugin-title').text();
+		var $self = $(this), title = $self.find('.plugin-title').text();
 
 		$self.attr('id', hash[title]);
 	});
