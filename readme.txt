@@ -1,6 +1,5 @@
 === Plugin Dependencies ===
 Contributors: scribu
-Donate link: http://scribu.net/wordpress
 Tags: plugin, dependency
 Requires at least: 3.1
 Tested up to: 3.2
