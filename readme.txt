@@ -3,7 +3,7 @@ Contributors: scribu
 Tags: plugin, dependency
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: trunk
+Stable tag: 1.2
 
 Plugin dependency management
 
