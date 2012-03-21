@@ -2,7 +2,7 @@
 Contributors: scribu
 Tags: plugin, dependency
 Requires at least: 3.1
-Tested up to: 3.2
+Tested up to: 3.3
 Stable tag: trunk
 
 Plugin dependency management
@@ -72,6 +72,10 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 2. Cascade deactivation
 
 == Changelog ==
+
+= 1.2 =
+* added ability to use plugin names as dependencies
+* [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-2.html)
 
 = 1.1 =
 * added 'Provides:' header

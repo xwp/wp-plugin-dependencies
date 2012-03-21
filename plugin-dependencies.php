@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Plugin Dependencies
-Version: 1.1.1-alpha
+Version: 1.2
 Description: Prevent activating plugins that don't have all their dependencies satisfied
 Author: scribu
 Author URI: http://scribu.net/
