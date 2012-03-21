@@ -49,11 +49,24 @@ class Plugin_Dependencies {
 	function init() {
 		$all_plugins = get_plugins();
 
-		foreach ( get_plugins() as $plugin => $plugin_data ) {
-			self::$dependencies[ $plugin ] = self::parse_field( $plugin_data['Depends'] );
+		$plugins_by_name = array();
+		foreach ( $all_plugins as $plugin => $plugin_data )
+			$plugins_by_name[ $plugin_data['Name'] ] = $plugin;
 
+		foreach ( $all_plugins as $plugin => $plugin_data ) {
 			self::$provides[ $plugin ] = self::parse_field( $plugin_data['Provides'] );
 			self::$provides[ $plugin ][] = $plugin;
+
+			$deps = array();
+
+			foreach ( self::parse_field( $plugin_data['Depends'] ) as $dep ) {
+				if ( isset( $plugins_by_name[ $dep ] ) )
+					$dep = $plugins_by_name[ $dep ];
+
+				$deps[] = $dep;
+			}
+
+			self::$dependencies[ $plugin ] = $deps;
 		}
 	}
 
