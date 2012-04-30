@@ -8,8 +8,6 @@ Author URI: http://scribu.net/
 Plugin URI: http://scribu.net/wordpress/plugin-dependencies
 Text Domain: plugin-dependencies
 Domain Path: /lang
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 if ( !is_admin() )
