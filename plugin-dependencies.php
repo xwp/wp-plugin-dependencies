@@ -13,7 +13,7 @@ Domain Path: /lang
 if ( !is_admin() )
 	return;
 
-add_action( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
+add_filter( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
 
 class Plugin_Dependencies {
 	private static $dependencies = array();
