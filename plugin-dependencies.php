@@ -194,7 +194,7 @@ class Plugin_Dependencies_UI {
 
 		Plugin_Dependencies::init();
 
-		load_plugin_textdomain( 'plugin-dependencies', '', dirname( plugin_basename( __FILE__ ) ) . '/lang' );
+		load_plugin_textdomain( 'plugin-dependencies', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
 		self::$msg = array(
 			array( 'deactivate', 'cascade', __( 'The following plugins have also been deactivated:', 'plugin-dependencies' ) ),
