@@ -23,14 +23,14 @@ class Plugin_Dependencies {
 	private static $deactivate_cascade;
 	private static $deactivate_conflicting;
 
-	function extra_plugin_headers( $headers ) {
+	public static function extra_plugin_headers( $headers ) {
 		$headers['Provides'] = 'Provides';
 		$headers['Depends'] = 'Depends';
 
 		return $headers;
 	}
 
-	function init() {
+	public static function init() {
 		$all_plugins = get_plugins();
 
 		$plugins_by_name = array();
@@ -54,7 +54,7 @@ class Plugin_Dependencies {
 		}
 	}
 
-	private function parse_field( $str ) {
+	private static function parse_field( $str ) {
 		return array_filter( preg_split( '/,\s*/', $str ) );
 	}
 
@@ -64,7 +64,7 @@ class Plugin_Dependencies {
 	 * @param string $plugin_id A plugin basename
 	 * @return array List of dependencies
 	 */
-	public function get_dependencies( $plugin_id ) {
+	public static function get_dependencies( $plugin_id ) {
 		return self::$dependencies[ $plugin_id ];
 	}
 
@@ -74,7 +74,7 @@ class Plugin_Dependencies {
 	 * @param string $plugin_id A plugin basename
 	 * @return array List of dependencies
 	 */
-	public function get_provided( $plugin_id ) {
+	public static function get_provided( $plugin_id ) {
 		return self::$provides[ $plugin_id ];
 	}
 
@@ -84,7 +84,7 @@ class Plugin_Dependencies {
 	 * @param string $dep Real or virtual dependency
 	 * @return array List of plugins
 	 */
-	public function get_providers( $dep ) {
+	public static function get_providers( $dep ) {
 		$plugin_ids = array();
 
 		if ( isset( self::$provides[ $dep ] ) ) {
@@ -107,7 +107,7 @@ class Plugin_Dependencies {
 	 * @param array $plugin_ids A list of plugin basenames
 	 * @return array List of deactivated plugins
 	 */
-	public function deactivate_conflicting( $to_activate ) {
+	public static function deactivate_conflicting( $to_activate ) {
 		$deps = array();
 		foreach ( $to_activate as $plugin_id ) {
 			$deps = array_merge( $deps, self::get_provided( $plugin_id ) );
@@ -138,7 +138,7 @@ class Plugin_Dependencies {
 	 * @param array $plugin_ids A list of plugin basenames
 	 * @return array List of deactivated plugins
 	 */
-	public function deactivate_cascade( $to_deactivate ) {
+	public static function deactivate_cascade( $to_deactivate ) {
 		if ( empty( $to_deactivate ) )
 			return array();
 
@@ -185,7 +185,7 @@ class Plugin_Dependencies_UI {
 
 	private static $msg;
 
-	function init() {
+	public static function init() {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
@@ -214,7 +214,7 @@ class Plugin_Dependencies_UI {
 		}
 	}
 
-	function admin_notices() {
+	static function admin_notices() {
 		foreach ( self::$msg as $args ) {
 			list( $action, $type, $text ) = $args;
 
@@ -234,7 +234,7 @@ class Plugin_Dependencies_UI {
 		}
 	}
 
-	function admin_print_styles() {
+	static function admin_print_styles() {
 ?>
 <style type="text/css">
 .dep-list li { list-style: disc inside none }
@@ -245,7 +245,7 @@ span.deps li.satisfied { color: green }
 <?php
 	}
 
-	function footer_script() {
+	static function footer_script() {
 		$all_plugins = get_plugins();
 
 		$hash = array();
@@ -269,7 +269,7 @@ jQuery(function($) {
 <?php
 	}
 
-	function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+	static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$deps = Plugin_Dependencies::get_dependencies( $plugin_file );
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
@@ -302,7 +302,7 @@ jQuery(function($) {
 		return $actions;
 	}
 
-	private function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
+	private static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
 
 		$dep_list = '';
