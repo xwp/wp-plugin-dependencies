@@ -3,7 +3,7 @@ Contributors: scribu
 Tags: plugin, dependency
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 2. Cascade deactivation
 
 == Changelog ==
+
+= 1.2.1 =
+* fixed notices. props cfoellmann
 
 = 1.2 =
 * added ability to use plugin names as dependencies
