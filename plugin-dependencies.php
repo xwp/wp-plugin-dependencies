@@ -31,7 +31,10 @@ class Plugin_Dependencies {
 	}
 
 	public static function init() {
-		$all_plugins = get_plugins();
+		$all_plugins = array_merge(
+			get_plugins(),
+			get_mu_plugins()
+		);
 
 		$plugins_by_name = array();
 		foreach ( $all_plugins as $plugin => $plugin_data )
@@ -274,6 +277,7 @@ jQuery(function($) {
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
 		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
+		$mu_plugins = array_keys( (array) get_mu_plugins() );
 
 		if ( empty( $deps ) )
 			return $actions;
@@ -282,8 +286,11 @@ jQuery(function($) {
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
-			if ( !count( array_intersect( $active_plugins, $plugin_ids ) ) )
+			if ( !count( array_intersect( $active_plugins, $plugin_ids ) )
+				&& !count( array_intersect( $mu_plugins, $plugin_ids ) )
+			) {
 				$unsatisfied[] = $dep;
+			}
 
 			if ( is_multisite() && !count( array_intersect( $network_active_plugins, $plugin_ids ) ) )
 				$unsatisfied_network[] = $dep;
@@ -304,11 +311,11 @@ jQuery(function($) {
 
 	private static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
+		$mu_plugins = get_mu_plugins();
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
-
 			if ( in_array( $dep, $unsatisfied ) )
 				$class = 'unsatisfied';
 			elseif ( in_array( $dep, $unsatisfied_network ) )
@@ -321,8 +328,21 @@ jQuery(function($) {
 			} else {
 				$list = array();
 				foreach ( $plugin_ids as $plugin_id ) {
-					$name = isset( $all_plugins[ $plugin_id ]['Name'] ) ? $all_plugins[ $plugin_id ]['Name'] : $plugin_id;
-					$list[] = html( 'a', array( 'href' => '#' . sanitize_title( $name ) ), $name );
+					if ( isset( $all_plugins[ $plugin_id ]['Name'] ) ) {
+						$name = $all_plugins[ $plugin_id ]['Name'];
+						$url = '#' . sanitize_title( $name );
+					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
+						$name = sprintf(
+							__( '%s (%s)', 'plugin-dependencies' ),
+							$mu_plugins[ $plugin_id ]['Name'],
+							__( 'must-use', 'plugin-dependencies' )
+						);
+						$url = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $name );
+					} else {
+						$name = $plugin_id;
+						$url = '#' . sanitize_title( $name );
+					}
+					$list[] = html( 'a', array( 'href' => $url ), $name );
 				}
 				$name = implode( ' or ', $list );
 			}
