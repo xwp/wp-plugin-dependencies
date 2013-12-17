@@ -337,7 +337,7 @@ jQuery(function($) {
 							$mu_plugins[ $plugin_id ]['Name'],
 							__( 'must-use', 'plugin-dependencies' )
 						);
-						$url = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $name );
+						$url = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $mu_plugins[ $plugin_id ]['Name'] );
 					} else {
 						$name = $plugin_id;
 						$url = '#' . sanitize_title( $name );
