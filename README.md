@@ -1,15 +1,15 @@
-=== Plugin Dependencies ===
-Contributors: scribu
-Tags: plugin, dependency
-Requires at least: 3.1
-Tested up to: 3.3
-Stable tag: 1.2.1
-License: GPLv2 or later
+# Plugin Dependencies 
+Contributors: scribu  
+Tags: plugin, dependency  
+Requires at least: 3.1  
+Tested up to: 3.3  
+Stable tag: 1.2.1  
+License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Plugin dependency management
 
-== Description ==
+## Description 
 
 This meta-plugin allows regular plugins to specify other plugins that they depend upon.
 
@@ -29,24 +29,24 @@ What this does:
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions 
 
-= Error on activation: "Parse error: syntax error, unexpected..." =
+### Error on activation: "Parse error: syntax error, unexpected..." 
 
 Make sure your host is running PHP 5. The only foolproof way to do this is to add this line to wp-config.php (after the opening `<?php` tag):
 
 `var_dump(PHP_VERSION);`
 <br>
 
-= What happens if a user doesn't have Plugin Dependencies installed? =
+### What happens if a user doesn't have Plugin Dependencies installed? 
 
 Nothing. The *Depends:* header will simply be ignored.
 
-= Can I have grand-child plugins? =
+### Can I have grand-child plugins? 
 
 Yes, the dependency chain can go as deep as you want.
 
-= Defining virtual packages =
+### Defining virtual packages 
 
 Say you have some useful functions that you would like to package up as a library plugin:
 
@@ -68,30 +68,30 @@ Depends: lib-facebook
 
 Besides being more robust, the *Provides:* header allows multiple plugins to implement the same set of functionality and be used interchangeably.
 
-== Screenshots ==
+## Screenshots 
 
 1. Activation prevention
 2. Cascade deactivation
 
-== Changelog ==
+## Changelog 
 
-= 1.2.1 =
+### 1.2.1 
 * fixed notices. props cfoellmann
 
-= 1.2 =
+### 1.2 
 * added ability to use plugin names as dependencies
 * [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-2.html)
 
-= 1.1 =
+### 1.1 
 * added 'Provides:' header
 * replaced 'Dependencies:' with 'Depends:'
 * [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-1.html)
 
-= 1.0.1 =
+### 1.0.1 
 * fixed critical bug when not running MultiSite
 * better network activation handling
 
-= 1.0 =
+### 1.0 
 * initial release
 * [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-0.html)
 
