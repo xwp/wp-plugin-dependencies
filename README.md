@@ -15,12 +15,12 @@ This meta-plugin allows regular plugins to specify other plugins that they depen
 
 Example:
 
-`
+```
 /*
 Plugin Name: BuddyPress Debug
 Depends: BuddyPress, Debug Bar
 */
-`
+```
 
 What this does:
 
