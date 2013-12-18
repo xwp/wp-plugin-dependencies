@@ -35,8 +35,9 @@ Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author'
 
 Make sure your host is running PHP 5. The only foolproof way to do this is to add this line to wp-config.php (after the opening `<?php` tag):
 
-`var_dump(PHP_VERSION);`
-<br>
+```php
+var_dump(PHP_VERSION);
+```
 
 ### What happens if a user doesn't have Plugin Dependencies installed? 
 
@@ -50,21 +51,21 @@ Yes, the dependency chain can go as deep as you want.
 
 Say you have some useful functions that you would like to package up as a library plugin:
 
-`
+```
 /*
 Plugin Name: Facebook Lib
 Provides: lib-facebook
 */
-`
+```
 
 Now, dependant plugins can specify 'lib-facebook' as a dependency:
 
-`
+```
 /*
 Plugin Name: Cool Facebook Plugin
 Depends: lib-facebook
 */
-`
+```
 
 Besides being more robust, the *Provides:* header allows multiple plugins to implement the same set of functionality and be used interchangeably.
 
