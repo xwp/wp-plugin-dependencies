@@ -30,6 +30,8 @@ What this does:
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
+**Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
+
 [![Build Status](https://travis-ci.org/x-team/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/x-team/wp-plugin-dependencies)
 
 ## Frequently Asked Questions ##

@@ -29,6 +29,8 @@ What this does:
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
+**Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
+
 == Frequently Asked Questions ==
 
 = Error on activation: "Parse error: syntax error, unexpected..." =
