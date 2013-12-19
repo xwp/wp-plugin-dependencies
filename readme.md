@@ -75,7 +75,7 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 ## Changelog ##
 
 ### 1.2.1 ###
-* fixed notices. props cfoellmann
+* fixed notices. props [cfoellmann](http://profiles.wordpress.org/cfoellmann)
 
 ### 1.2 ###
 * added ability to use plugin names as dependencies
