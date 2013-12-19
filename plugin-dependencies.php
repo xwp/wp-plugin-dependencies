@@ -148,13 +148,15 @@ class Plugin_Dependencies {
 	 * @return array List of deactivated plugins
 	 */
 	public static function deactivate_cascade( $to_deactivate ) {
-		if ( empty( $to_deactivate ) )
+		if ( empty( $to_deactivate ) ) {
 			return array();
+		}
 
 		self::$active_plugins = get_option( 'active_plugins', array() );
 
-		if ( is_multisite() )
+		if ( is_multisite() ) {
 			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+		}
 
 		self::$deactivate_cascade = array();
 
@@ -165,8 +167,9 @@ class Plugin_Dependencies {
 
 	private function _cascade( $to_deactivate ) {
 		$to_deactivate_deps = array();
-		foreach ( $to_deactivate as $plugin_id )
+		foreach ( $to_deactivate as $plugin_id ) {
 			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
+		}
 
 		$found = array();
 		foreach ( self::$active_plugins as $dep ) {
@@ -329,12 +332,15 @@ class Plugin_Dependencies_UI {
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
-			if ( in_array( $dep, $unsatisfied ) )
+			if ( in_array( $dep, $unsatisfied ) ) {
 				$class = 'unsatisfied';
-			elseif ( in_array( $dep, $unsatisfied_network ) )
+			}
+			elseif ( in_array( $dep, $unsatisfied_network ) ) {
 				$class = 'unsatisfied_network';
-			else
+			}
+			else {
 				$class = 'satisfied';
+			}
 
 			if ( empty( $plugin_ids ) ) {
 				$name = html( 'span', esc_html( $dep ) );
