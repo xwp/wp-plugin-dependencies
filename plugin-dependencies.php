@@ -14,7 +14,40 @@ if ( ! is_admin() ) {
 	return;
 }
 
-add_filter( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
+
+/**
+ * Main plugin class
+ */
+class Plugin_Dependencies_Loader {
+
+	/**
+	 * Initialize plugin
+	 *
+	 * @access public
+	 * @action plugins_loaded
+	 * @return void
+	 */
+	public static function init() {
+		add_filter( 'extra_plugin_headers', array( __CLASS__, 'extra_plugin_headers' ) );
+		add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
+	}
+
+
+	/**
+	 * Add extra plugin headers
+	 *
+	 * @param array $headers Plugin headers
+	 * @return array
+	 */
+	public static function extra_plugin_headers( $headers ) {
+		$headers['Provides'] = 'Provides';
+		$headers['Depends']  = 'Depends';
+
+		return $headers;
+	}
+}
+add_action( 'plugins_loaded', array( 'Plugin_Dependencies_Loader', 'init' ) );
+
 
 class Plugin_Dependencies {
 
@@ -25,13 +58,6 @@ class Plugin_Dependencies {
 	private static $active_plugins;
 	private static $deactivate_cascade;
 	private static $deactivate_conflicting;
-
-	public static function extra_plugin_headers( $headers ) {
-		$headers['Provides'] = 'Provides';
-		$headers['Depends']  = 'Depends';
-
-		return $headers;
-	}
 
 	public static function init() {
 		$all_plugins = array_merge(
@@ -192,8 +218,6 @@ class Plugin_Dependencies {
 	}
 }
 
-
-add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
 
 class Plugin_Dependencies_UI {
 
