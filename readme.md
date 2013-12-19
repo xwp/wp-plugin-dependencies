@@ -3,7 +3,7 @@
 
 Plugin dependency management
 
-**Contributors:** [scribu](http://profiles.wordpress.org/scribu)  
+**Contributors:** [scribu](http://profiles.wordpress.org/scribu), [x-team](http://profiles.wordpress.org/x-team), [kucrut](http://profiles.wordpress.org/kucrut)  
 **Tags:** [plugin](http://wordpress.org/plugins/tags/plugin), [dependency](http://wordpress.org/plugins/tags/dependency)  
 **Requires at least:** 3.1  
 **Tested up to:** 3.3  

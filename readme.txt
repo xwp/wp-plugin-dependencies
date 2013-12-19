@@ -1,5 +1,5 @@
 === Plugin Dependencies ===
-Contributors: scribu
+Contributors: scribu, X-team, kucrut
 Tags: plugin, dependency
 Requires at least: 3.1
 Tested up to: 3.3
