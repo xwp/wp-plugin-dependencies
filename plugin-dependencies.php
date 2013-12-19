@@ -10,13 +10,16 @@ Text Domain: plugin-dependencies
 Domain Path: /lang
 */
 
-if ( !is_admin() )
+if ( ! is_admin() ) {
 	return;
+}
 
 add_filter( 'extra_plugin_headers', array( 'Plugin_Dependencies', 'extra_plugin_headers' ) );
 
 class Plugin_Dependencies {
+
 	private static $dependencies = array();
+
 	private static $provides = array();
 
 	private static $active_plugins;
@@ -25,7 +28,7 @@ class Plugin_Dependencies {
 
 	public static function extra_plugin_headers( $headers ) {
 		$headers['Provides'] = 'Provides';
-		$headers['Depends'] = 'Depends';
+		$headers['Depends']  = 'Depends';
 
 		return $headers;
 	}
@@ -37,18 +40,20 @@ class Plugin_Dependencies {
 		);
 
 		$plugins_by_name = array();
-		foreach ( $all_plugins as $plugin => $plugin_data )
+		foreach ( $all_plugins as $plugin => $plugin_data ) {
 			$plugins_by_name[ $plugin_data['Name'] ] = $plugin;
+		}
 
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
-			self::$provides[ $plugin ] = self::parse_field( $plugin_data['Provides'] );
+			self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] );
 			self::$provides[ $plugin ][] = $plugin;
 
 			$deps = array();
 
 			foreach ( self::parse_field( $plugin_data['Depends'] ) as $dep ) {
-				if ( isset( $plugins_by_name[ $dep ] ) )
+				if ( isset( $plugins_by_name[ $dep ] ) ) {
 					$dep = $plugins_by_name[ $dep ];
+				}
 
 				$deps[] = $dep;
 			}
@@ -123,8 +128,9 @@ class Plugin_Dependencies {
 		foreach ( $to_check as $active_plugin ) {
 			$common = array_intersect( $deps, self::get_provided( $active_plugin ) );
 
-			if ( !empty( $common ) )
+			if ( ! empty( $common ) ) {
 				$conflicting[] = $active_plugin;
+			}
 		}
 
 		// TODO: don't deactivate plugins that would still have all dependencies satisfied
@@ -142,13 +148,15 @@ class Plugin_Dependencies {
 	 * @return array List of deactivated plugins
 	 */
 	public static function deactivate_cascade( $to_deactivate ) {
-		if ( empty( $to_deactivate ) )
+		if ( empty( $to_deactivate ) ) {
 			return array();
+		}
 
 		self::$active_plugins = get_option( 'active_plugins', array() );
 
-		if ( is_multisite() )
+		if ( is_multisite() ) {
 			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+		}
 
 		self::$deactivate_cascade = array();
 
@@ -159,19 +167,22 @@ class Plugin_Dependencies {
 
 	private function _cascade( $to_deactivate ) {
 		$to_deactivate_deps = array();
-		foreach ( $to_deactivate as $plugin_id )
+		foreach ( $to_deactivate as $plugin_id ) {
 			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
+		}
 
 		$found = array();
 		foreach ( self::$active_plugins as $dep ) {
 			$matching_deps = array_intersect( $to_deactivate_deps, self::get_dependencies( $dep ) );
-			if ( !empty( $matching_deps ) )
+			if ( ! empty( $matching_deps ) ) {
 				$found[] = $dep;
+			}
 		}
 
 		$found = array_diff( $found, self::$deactivate_cascade ); // prevent endless loop
-		if ( empty( $found ) )
+		if ( empty( $found ) ) {
 			return;
+		}
 
 		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
 
@@ -204,8 +215,9 @@ class Plugin_Dependencies_UI {
 			array( 'activate', 'conflicting', __( 'The following plugins have been deactivated due to dependency conflicts:', 'plugin-dependencies' ) ),
 		);
 
-		if ( !isset( $_REQUEST['action'] ) )
+		if ( ! isset( $_REQUEST['action'] ) ) {
 			return;
+		}
 
 		foreach ( self::$msg as $args ) {
 			list( $action, $type ) = $args;
@@ -221,31 +233,34 @@ class Plugin_Dependencies_UI {
 		foreach ( self::$msg as $args ) {
 			list( $action, $type, $text ) = $args;
 
-			if ( !isset( $_REQUEST[ $action ] ) )
+			if ( ! isset( $_REQUEST[ $action ] ) ) {
 				continue;
+			}
 
 			$deactivated = get_transient( "pd_deactivate_$type" );
 			delete_transient( "pd_deactivate_$type" );
 
-			if ( empty( $deactivated ) )
+			if ( empty( $deactivated ) ) {
 				continue;
+			}
 
-			echo
-			html( 'div', array( 'class' => 'updated' ),
+			echo html(
+				'div',
+				array( 'class' => 'updated' ),
 				html( 'p', $text, self::generate_dep_list( $deactivated ) )
-			);
+			); // xss ok
 		}
 	}
 
 	static function admin_print_styles() {
-?>
-<style type="text/css">
-.dep-list li { list-style: disc inside none }
-span.deps li.unsatisfied { color: red }
-span.deps li.unsatisfied_network { color: orange }
-span.deps li.satisfied { color: green }
-</style>
-<?php
+		?>
+			<style type="text/css">
+				.dep-list li { list-style: disc inside none }
+				span.deps li.unsatisfied { color: red }
+				span.deps li.unsatisfied_network { color: orange }
+				span.deps li.satisfied { color: green }
+			</style>
+		<?php
 	}
 
 	static function footer_script() {
@@ -256,20 +271,19 @@ span.deps li.satisfied { color: green }
 			$name = isset( $data['Name'] ) ? $data['Name'] : $file;
 			$hash[ $name ] = sanitize_title( $name );
 		}
+		?>
+			<script type="text/javascript">
+				jQuery(function($) {
+					var hash = <?php echo json_encode( $hash ); ?>
 
-?>
-<script type="text/javascript">
-jQuery(function($) {
-	var hash = <?php echo json_encode( $hash ); ?>
+					$('table.widefat tbody tr').not('.second').each(function() {
+						var $self = $(this), title = $self.find('.plugin-title').text();
 
-	$('table.widefat tbody tr').not('.second').each(function() {
-		var $self = $(this), title = $self.find('.plugin-title').text();
-
-		$self.attr('id', hash[title]);
-	});
-});
-</script>
-<?php
+						$self.attr('id', hash[title]);
+					});
+				});
+			</script>
+		<?php
 	}
 
 	static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
@@ -279,28 +293,30 @@ jQuery(function($) {
 		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
 		$mu_plugins = array_keys( (array) get_mu_plugins() );
 
-		if ( empty( $deps ) )
+		if ( empty( $deps ) ) {
 			return $actions;
+		}
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
-			if ( !count( array_intersect( $active_plugins, $plugin_ids ) )
-				&& !count( array_intersect( $mu_plugins, $plugin_ids ) )
+			if ( ! count( array_intersect( $active_plugins, $plugin_ids ) )
+				&& ! count( array_intersect( $mu_plugins, $plugin_ids ) )
 			) {
 				$unsatisfied[] = $dep;
 			}
 
-			if ( is_multisite() && !count( array_intersect( $network_active_plugins, $plugin_ids ) ) )
+			if ( is_multisite() && ! count( array_intersect( $network_active_plugins, $plugin_ids ) ) ) {
 				$unsatisfied_network[] = $dep;
+			}
 		}
 
-		if ( !empty( $unsatisfied ) ) {
+		if ( ! empty( $unsatisfied ) ) {
 			unset( $actions['activate'] );
 		}
 
-		if ( !empty( $unsatisfied_network ) ) {
+		if ( ! empty( $unsatisfied_network ) ) {
 			unset( $actions['network_activate'] );
 		}
 
@@ -311,17 +327,20 @@ jQuery(function($) {
 
 	private static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
-		$mu_plugins = get_mu_plugins();
+		$mu_plugins  = get_mu_plugins();
 
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
-			if ( in_array( $dep, $unsatisfied ) )
+			if ( in_array( $dep, $unsatisfied ) ) {
 				$class = 'unsatisfied';
-			elseif ( in_array( $dep, $unsatisfied_network ) )
+			}
+			elseif ( in_array( $dep, $unsatisfied_network ) ) {
 				$class = 'unsatisfied_network';
-			else
+			}
+			else {
 				$class = 'satisfied';
+			}
 
 			if ( empty( $plugin_ids ) ) {
 				$name = html( 'span', esc_html( $dep ) );
@@ -330,17 +349,17 @@ jQuery(function($) {
 				foreach ( $plugin_ids as $plugin_id ) {
 					if ( isset( $all_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = $all_plugins[ $plugin_id ]['Name'];
-						$url = '#' . sanitize_title( $name );
+						$url  = '#' . sanitize_title( $name );
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = sprintf(
 							__( '%s (%s)', 'plugin-dependencies' ),
 							$mu_plugins[ $plugin_id ]['Name'],
 							__( 'must-use', 'plugin-dependencies' )
 						);
-						$url = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $mu_plugins[ $plugin_id ]['Name'] );
+						$url  = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $mu_plugins[ $plugin_id ]['Name'] );
 					} else {
 						$name = $plugin_id;
-						$url = '#' . sanitize_title( $name );
+						$url  = '#' . sanitize_title( $name );
 					}
 					$list[] = html( 'a', array( 'href' => $url ), $name );
 				}
@@ -355,35 +374,36 @@ jQuery(function($) {
 }
 
 
-if ( ! function_exists( 'html' ) ):
-function html( $tag ) {
-	$args = func_get_args();
+if ( ! function_exists( 'html' ) ) :
+	function html( $tag ) {
+		$args = func_get_args();
 
-	$tag = array_shift( $args );
+		$tag = array_shift( $args );
 
-	if ( is_array( $args[0] ) ) {
-		$closing = $tag;
-		$attributes = array_shift( $args );
-		foreach ( $attributes as $key => $value ) {
-			if ( false === $value )
-				continue;
+		if ( is_array( $args[0] ) ) {
+			$closing    = $tag;
+			$attributes = array_shift( $args );
+			foreach ( $attributes as $key => $value ) {
+				if ( false === $value ) {
+					continue;
+				}
 
-			if ( true === $value )
-				$value = $key;
+				if ( true === $value ) {
+					$value = $key;
+				}
 
-			$tag .= ' ' . $key . '="' . esc_attr( $value ) . '"';
+				$tag .= ' ' . $key . '="' . esc_attr( $value ) . '"';
+			}
+		} else {
+			list( $closing ) = explode( ' ', $tag, 2 );
 		}
-	} else {
-		list( $closing ) = explode( ' ', $tag, 2 );
+
+		if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ) ) ) {
+			return "<{$tag} />";
+		}
+
+		$content = implode( '', $args );
+
+		return "<{$tag}>{$content}</{$closing}>";
 	}
-
-	if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ) ) ) {
-		return "<{$tag} />";
-	}
-
-	$content = implode( '', $args );
-
-	return "<{$tag}>{$content}</{$closing}>";
-}
 endif;
-
