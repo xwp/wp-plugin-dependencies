@@ -224,6 +224,12 @@ class Plugin_Dependencies_UI {
 	private static $msg;
 
 	public static function init() {
+		if ( ! empty( $_REQUEST['plugin_status'] )
+			&& in_array( $_REQUEST['plugin_status'], array( 'mustuse', 'dropins' ) )
+		) {
+			return;
+		}
+
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
