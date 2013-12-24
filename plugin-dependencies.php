@@ -51,15 +51,40 @@ add_action( 'plugins_loaded', array( 'Plugin_Dependencies_Loader', 'init' ) );
 
 class Plugin_Dependencies {
 
+	/**
+	 * Holds plugin dependencies
+	 *
+	 * @access private
+	 * @var array
+	 */
 	private static $dependencies = array();
+
+	/**
+	 * Holds parent > children relationship
+	 *
+	 * @since 1.3
+	 * @access private
+	 * @var array
+	 */
+	private static $parent_children = array();
+
+	/**
+	 * Holds active plugins
+	 *
+	 * @access private
+	 * @var array
+	 */
+	private static $active_plugins;
 
 	private static $provides = array();
 
-	private static $active_plugins;
 	private static $deactivate_cascade;
 	private static $deactivate_conflicting;
 
 	public static function init() {
+		self::_cache_active_plugins();
+
+		// Collect dependencies
 		$all_plugins = array_merge(
 			get_plugins(),
 			get_mu_plugins()
@@ -86,6 +111,69 @@ class Plugin_Dependencies {
 
 			self::$dependencies[ $plugin ] = $deps;
 		}
+
+		// Collect parent > children relationship
+		$parent_children = array();
+		foreach ( get_plugins() as $plugin_id => $plugin_data ) {
+			$parent_children[ $plugin_id ] = self::get_children( $plugin_id );
+		}
+
+		foreach ( $parent_children as $parent => $children ) {
+			foreach ( $children as $child ) {
+				if ( ! empty( $parent_children[ $child ] ) ) {
+					$parent_children[ $parent ] = array_merge(
+						$children,
+						$parent_children[ $child ]
+					);
+				}
+			}
+		}
+
+		self::$parent_children = $parent_children;
+	}
+
+	/**
+	 * Cache active plugins
+	 *
+	 * @since 1.3
+	 * @access private
+	 * @return void
+	 */
+	private static function _cache_active_plugins() {
+		self::$active_plugins = get_option( 'active_plugins', array() );
+
+		if ( is_multisite() ) {
+			self::$active_plugins = array_merge(
+				self::$active_plugins,
+				get_site_option( 'active_sitewide_plugins', array() )
+			);
+		}
+	}
+
+	/**
+	 * Get children plugins
+	 *
+	 * @since 1.3
+	 * @access public
+	 * @param string $plugin_id
+	 * @return array
+	 */
+	public static function get_children( $plugin_id ) {
+		$children = array();
+		$provides = self::get_provided( $plugin_id );
+
+		foreach ( self::$active_plugins as $dep ) {
+			$matching_deps = array_intersect(
+				$provides,
+				self::get_dependencies( $dep )
+			);
+
+			if ( ! empty( $matching_deps ) ) {
+				$children[] = $dep;
+			}
+		}
+
+		return $children;
 	}
 
 	private static function parse_field( $str ) {
@@ -173,22 +261,20 @@ class Plugin_Dependencies {
 	 * @param array $plugin_ids A list of plugin basenames
 	 * @return array List of deactivated plugins
 	 */
-	public static function deactivate_cascade( $to_deactivate ) {
-		if ( empty( $to_deactivate ) ) {
-			return array();
+	public static function deactivate_cascade( $plugin_ids ) {
+		$to_deactivate = array();
+		foreach ( $plugin_ids as $plugin_id ) {
+			if ( ! empty( self::$parent_children[ $plugin_id ] ) ) {
+				$to_deactivate = array_merge(
+					$to_deactivate,
+					self::$parent_children[ $plugin_id ]
+				);
+			}
 		}
 
-		self::$active_plugins = get_option( 'active_plugins', array() );
+		deactivate_plugins( $to_deactivate );
 
-		if ( is_multisite() ) {
-			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-		}
-
-		self::$deactivate_cascade = array();
-
-		self::_cascade( $to_deactivate );
-
-		return self::$deactivate_cascade;
+		return $to_deactivate;
 	}
 
 	private function _cascade( $to_deactivate ) {
