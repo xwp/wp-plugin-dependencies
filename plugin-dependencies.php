@@ -33,8 +33,6 @@ class Plugin_Dependencies_Loader {
 
 		add_filter( 'extra_plugin_headers', array( __CLASS__, 'extra_plugin_headers' ) );
 		add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
-
-		Plugin_Dependencies::init();
 	}
 
 
@@ -358,6 +356,8 @@ class Plugin_Dependencies_UI {
 		) {
 			return;
 		}
+
+		Plugin_Dependencies::init();
 
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
