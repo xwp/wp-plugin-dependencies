@@ -28,8 +28,13 @@ class Plugin_Dependencies_Loader {
 	 * @return void
 	 */
 	public static function init() {
+		add_action( 'update_option_active_plugins', array( 'Plugin_Dependencies', 'on_update_active_plugins' ), 10, 2 );
+		add_action( 'update_site_option_active_sitewide_plugins', array( 'Plugin_Dependencies', 'on_update_active_plugins' ), 10, 3 );
+
 		add_filter( 'extra_plugin_headers', array( __CLASS__, 'extra_plugin_headers' ) );
 		add_action( 'load-plugins.php', array( 'Plugin_Dependencies_UI', 'init' ) );
+
+		Plugin_Dependencies::init();
 	}
 
 
@@ -159,6 +164,10 @@ class Plugin_Dependencies {
 	 * @return array
 	 */
 	public static function get_children( $plugin_id ) {
+		if ( isset( self::$parent_children[ $plugin_id ] ) ) {
+			return self::$parent_children[ $plugin_id ];
+		}
+
 		$children = array();
 		$provides = self::get_provided( $plugin_id );
 
@@ -256,25 +265,59 @@ class Plugin_Dependencies {
 	}
 
 	/**
-	 * Deactivate plugins that would have unmet dependencies
+	 * Callback for update_option_active_plugins
 	 *
-	 * @param array $plugin_ids A list of plugin basenames
-	 * @return array List of deactivated plugins
+	 * See http://wordpress.stackexchange.com/a/56924
+	 *
+	 * @since 1.3
+	 *
+	 * @param array $old          Previous active plugins
+	 * @param array $new          Current active plugins
+	 * @param bool  $network_wide Network (de)activation
+	 *
+	 * @action update_option_active_plugins
+	 *
+	 * @return void
 	 */
-	public static function deactivate_cascade( $plugin_ids ) {
-		$to_deactivate = array();
-		foreach ( $plugin_ids as $plugin_id ) {
-			if ( ! empty( self::$parent_children[ $plugin_id ] ) ) {
-				$to_deactivate = array_merge(
-					$to_deactivate,
-					self::$parent_children[ $plugin_id ]
-				);
-			}
+	public static function on_update_active_plugins( $old, $new, $network_wide = false ) {
+		if ( $old === $new ) {
+			return;
 		}
 
-		deactivate_plugins( $to_deactivate );
+		if ( ! function_exists( 'deactivate_plugins' ) ) {
+			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+		}
 
-		return $to_deactivate;
+		$is_deactivating = count( $old ) > count( $new );
+
+		if ( $is_deactivating ) {
+			$plugin_ids = array_diff( $old, $new );
+			foreach ( $plugin_ids as $plugin ) {
+				$children = self::get_children( $plugin );
+				if ( ! empty( $children ) ) {
+					deactivate_plugins( $children, false, $network_wide );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Callback for update_site_option_active_sitewide_plugins
+	 *
+	 * See http://wordpress.stackexchange.com/a/56924
+	 *
+	 * @since 1.3
+	 *
+	 * @param string $option Option name
+	 * @param array  $new    Current active plugins
+	 * @param array  $old    Previous active plugins
+	 *
+	 * @action update_site_option_active_sitewide_plugins
+	 *
+	 * @return void
+	 */
+	public static function on_update_active_sitewide_plugins( $option, $new, $old ) {
+		self::on_update_active_plugins( $old, $new, true );
 	}
 
 	private function _cascade( $to_deactivate ) {
@@ -322,14 +365,14 @@ class Plugin_Dependencies_UI {
 
 		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
 
-		Plugin_Dependencies::init();
-
 		load_plugin_textdomain( 'plugin-dependencies', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
 		self::$msg = array(
 			array( 'deactivate', 'cascade', __( 'The following plugins have also been deactivated:', 'plugin-dependencies' ) ),
 			array( 'activate', 'conflicting', __( 'The following plugins have been deactivated due to dependency conflicts:', 'plugin-dependencies' ) ),
 		);
+		// TODO
+		return;
 
 		if ( ! isset( $_REQUEST['action'] ) ) {
 			return;
