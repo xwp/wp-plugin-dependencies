@@ -309,6 +309,8 @@ class Plugin_Dependencies_UI {
 
 	private static $msg;
 
+	private static $deps = array();
+
 	public static function init() {
 		if ( ! empty( $_REQUEST['plugin_status'] )
 			&& in_array( $_REQUEST['plugin_status'], array( 'mustuse', 'dropins' ) )
@@ -321,6 +323,8 @@ class Plugin_Dependencies_UI {
 		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
 
 		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
+		add_filter( 'manage_plugins_columns', array( __CLASS__, 'add_columns' ) );
+		add_action( 'manage_plugins_custom_column', array( __CLASS__, 'column_content' ), 10, 3 );
 
 		Plugin_Dependencies::init();
 
@@ -371,10 +375,17 @@ class Plugin_Dependencies_UI {
 	static function admin_print_styles() {
 		?>
 			<style type="text/css">
-				.dep-list li { list-style: disc inside none }
-				span.deps li.unsatisfied { color: red }
-				span.deps li.unsatisfied_network { color: orange }
-				span.deps li.satisfied { color: green }
+				.column-dependencies,
+				.column-children {
+					white-space: nowrap;
+				}
+				.dep-list {
+					margin: 0;
+					list-style: disc inside none;
+				}
+				.column-dependencies li.unsatisfied { color: red }
+				.column-dependencies li.unsatisfied_network { color: orange }
+				.column-dependencies li.satisfied { color: green }
 			</style>
 		<?php
 	}
@@ -403,6 +414,11 @@ class Plugin_Dependencies_UI {
 	}
 
 	static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+		$children = Plugin_Dependencies::get_children( $plugin_file );
+		if ( ! empty( $children ) ) {
+			unset( $actions['deactivate'] );
+		}
+
 		$deps = Plugin_Dependencies::get_dependencies( $plugin_file );
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
@@ -436,7 +452,7 @@ class Plugin_Dependencies_UI {
 			unset( $actions['network_activate'] );
 		}
 
-		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies' ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		self::$deps[ $plugin_file ] = compact( 'deps', 'unsatisfied', 'unsatisfied_network' );
 
 		return $actions;
 	}
@@ -486,6 +502,77 @@ class Plugin_Dependencies_UI {
 		}
 
 		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
+	}
+
+	/**
+	 * Add custom column
+	 *
+	 * @since 1.3
+	 * @filter manage_plugins_columns
+	 * @param array $columns
+	 * @return array
+	 */
+	static function add_columns( $columns ) {
+		$name_position = array_search( 'name', array_keys( $columns ) );
+		if ( false === $name_position ) {
+			$name_position = count( $columns );
+		}
+
+		$columns = array_merge(
+			array_slice( $columns, 0, ++$name_position ),
+			array(
+				'dependencies' => __( 'Dependencies', 'plugin-dependencies' ),
+				'children'     => __( 'Required by', 'plugin-dependencies' ),
+			),
+			array_slice( $columns, $name_position )
+		);
+
+		return $columns;
+	}
+
+	/**
+	 * Print column content
+	 *
+	 * @since 1.3
+	 * @action manage_plugins_custom_column
+	 * @param string $column_name Column Name
+	 * @param string $plugin_file Plugin file
+	 * @param array  $plugin_data Plugin data
+	 * @return void
+	 */
+	static function column_content( $column_name, $plugin_file, $plugin_data ) {
+		if ( method_exists( __CLASS__, "column_$column_name" ) ) {
+			call_user_func_array( array( __CLASS__, "column_$column_name" ), array( $plugin_file, $plugin_data ) );
+		}
+	}
+
+	/**
+	 * Print dependencies
+	 *
+	 * @since 1.3
+	 * @param string $plugin_file Plugin file
+	 * @param array  $plugin_data Plugin data
+	 * @return void
+	 */
+	static function column_dependencies( $plugin_file, $plugin_data ) {
+		if ( ! empty( self::$deps[ $plugin_file ] ) ) {
+			echo call_user_func_array( array( __CLASS__, 'generate_dep_list' ), self::$deps[ $plugin_file ] ); // xss ok
+		}
+	}
+
+	/**
+	 * Print children
+	 *
+	 * @since 1.3
+	 * @param string $plugin_file Plugin file
+	 * @param array  $plugin_data Plugin data
+	 * @return void
+	 */
+	static function column_children( $plugin_file, $plugin_data ) {
+		$children = Plugin_Dependencies::get_children( $plugin_file );
+		if ( ! empty( $children ) ) {
+			echo self::generate_dep_list( $children ); // xss ok
+		}
 	}
 }
 
