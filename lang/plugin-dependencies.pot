@@ -37,15 +37,15 @@ msgid "Required plugins:"
 msgstr ""
 
 #: ../plugin-dependencies.php:361
-msgid "Unsatisfied"
+msgid "Dependency: Unsatisfied"
 msgstr ""
 
 #: ../plugin-dependencies.php:365
-msgid "Network unsatisfied"
+msgid "Dependency: Network unsatisfied"
 msgstr ""
 
 #: ../plugin-dependencies.php:369
-msgid "Satisfied"
+msgid "Dependency: Satisfied"
 msgstr ""
 
 #: ../plugin-dependencies.php:384
