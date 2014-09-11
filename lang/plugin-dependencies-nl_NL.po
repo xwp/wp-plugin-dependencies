@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
-"POT-Creation-Date: 2014-09-11 23:17+0100\n"
-"PO-Revision-Date: 2014-09-11 23:37+0100\n"
+"POT-Creation-Date: 2014-09-11 23:59+0100\n"
+"PO-Revision-Date: 2014-09-12 00:38+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
 "Language: nl_NL\n"
@@ -49,6 +49,11 @@ msgstr "Afhankelijkheid: Netwerk voldoet niet"
 #: ../plugin-dependencies.php:369
 msgid "Dependency: Satisfied"
 msgstr "Afhankelijkheid: Voldoet"
+
+#: ../plugin-dependencies.php:382
+#, php-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
 
 #: ../plugin-dependencies.php:384
 msgid "must-use"
