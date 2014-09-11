@@ -376,7 +376,7 @@ class Plugin_Dependencies_UI {
 						$url  = '#' . sanitize_title( $name );
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = sprintf(
-							__( '%s (%s)', 'plugin-dependencies' ),
+							'%s (%s)',
 							$mu_plugins[ $plugin_id ]['Name'],
 							__( 'must-use', 'plugin-dependencies' )
 						);
