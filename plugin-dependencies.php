@@ -282,7 +282,7 @@ class Plugin_Dependencies_UI {
 				.dep-list li { list-style: disc inside none }
 				span.deps li.unsatisfied { color: red }
 				span.deps li.unsatisfied_network { color: orange }
-				span.deps li.satisfied { color: green }
+				span.deps li.satisfied { color: lime }
 			</style>
 		<?php
 	}
@@ -358,12 +358,15 @@ class Plugin_Dependencies_UI {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 			if ( in_array( $dep, $unsatisfied ) ) {
 				$class = 'unsatisfied';
+				$title = __( 'Dependency: Unsatisfied', 'plugin-dependencies' );
 			}
 			elseif ( in_array( $dep, $unsatisfied_network ) ) {
 				$class = 'unsatisfied_network';
+				$title = __( 'Dependency: Network unsatisfied', 'plugin-dependencies' );
 			}
 			else {
 				$class = 'satisfied';
+				$title = __( 'Dependency: Satisfied', 'plugin-dependencies' );
 			}
 
 			if ( empty( $plugin_ids ) ) {
@@ -376,7 +379,7 @@ class Plugin_Dependencies_UI {
 						$url  = '#' . sanitize_title( $name );
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = sprintf(
-							'%s (%s)',
+							__( '%s (%s)', 'plugin-dependencies' ),
 							$mu_plugins[ $plugin_id ]['Name'],
 							__( 'must-use', 'plugin-dependencies' )
 						);
@@ -385,7 +388,7 @@ class Plugin_Dependencies_UI {
 						$name = $plugin_id;
 						$url  = '#' . sanitize_title( $name );
 					}
-					$list[] = html( 'a', array( 'href' => $url ), $name );
+					$list[] = html( 'a', array( 'href' => $url, 'title' => $title ), $name );
 				}
 				$name = implode( ' or ', $list );
 			}

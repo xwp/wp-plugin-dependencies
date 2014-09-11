@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
-"POT-Creation-Date: 2014-09-11 23:17+0100\n"
-"PO-Revision-Date: 2014-09-11 23:19+0100\n"
+"POT-Creation-Date: 2014-09-11 23:59+0100\n"
+"PO-Revision-Date: 2014-09-11 23:59+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
 "Language: English\n"
@@ -46,6 +46,11 @@ msgstr ""
 
 #: ../plugin-dependencies.php:369
 msgid "Dependency: Satisfied"
+msgstr ""
+
+#: ../plugin-dependencies.php:382
+#, php-format
+msgid "%s (%s)"
 msgstr ""
 
 #: ../plugin-dependencies.php:384
