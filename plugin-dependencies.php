@@ -229,6 +229,7 @@ class Plugin_Dependencies_UI {
 		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
 
 		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
+		add_filter( 'network_admin_plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 4 );
 
 		Plugin_Dependencies::init();
 
