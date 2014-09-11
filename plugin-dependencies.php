@@ -191,7 +191,7 @@ class Plugin_Dependencies {
 		return self::$deactivate_cascade;
 	}
 
-	private function _cascade( $to_deactivate ) {
+	private static function _cascade( $to_deactivate ) {
 		$to_deactivate_deps = array();
 		foreach ( $to_deactivate as $plugin_id ) {
 			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
@@ -253,7 +253,7 @@ class Plugin_Dependencies_UI {
 		}
 	}
 
-	static function admin_notices() {
+	public static function admin_notices() {
 		foreach ( self::$msg as $args ) {
 			list( $action, $type, $text ) = $args;
 
@@ -276,7 +276,7 @@ class Plugin_Dependencies_UI {
 		}
 	}
 
-	static function admin_print_styles() {
+	public static function admin_print_styles() {
 		?>
 			<style type="text/css">
 				.dep-list li { list-style: disc inside none }
@@ -287,7 +287,7 @@ class Plugin_Dependencies_UI {
 		<?php
 	}
 
-	static function footer_script() {
+	public static function footer_script() {
 		$all_plugins = get_plugins();
 
 		$hash = array();
@@ -310,7 +310,7 @@ class Plugin_Dependencies_UI {
 		<?php
 	}
 
-	static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+	public static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$deps = Plugin_Dependencies::get_dependencies( $plugin_file );
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
