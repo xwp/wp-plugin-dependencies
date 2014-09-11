@@ -8,9 +8,10 @@ msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
 "POT-Creation-Date: 2014-09-11 23:17+0100\n"
-"PO-Revision-Date: 2014-09-11 23:32+0100\n"
+"PO-Revision-Date: 2014-09-11 23:37+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
+"Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,7 +20,6 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;_n;_x;_ex;_nx;esc_html__;esc_html_e;esc_html_x;"
 "esc_attr__;esc_attr_e;esc_attr_x;_n_noop;_nx_noop\n"
 "X-Poedit-Basepath: .\n"
-"Language: nl_NL\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
@@ -39,16 +39,16 @@ msgid "Required plugins:"
 msgstr "Vereiste plugins:"
 
 #: ../plugin-dependencies.php:361
-msgid "Unsatisfied"
-msgstr "Voldoet niet"
+msgid "Dependency: Unsatisfied"
+msgstr "Afhankelijkheid: Voldoet niet"
 
 #: ../plugin-dependencies.php:365
-msgid "Network unsatisfied"
-msgstr "Netwerk voldoet niet"
+msgid "Dependency: Network unsatisfied"
+msgstr "Afhankelijkheid: Netwerk voldoet niet"
 
 #: ../plugin-dependencies.php:369
-msgid "Satisfied"
-msgstr "Voldoet"
+msgid "Dependency: Satisfied"
+msgstr "Afhankelijkheid: Voldoet"
 
 #: ../plugin-dependencies.php:384
 msgid "must-use"
