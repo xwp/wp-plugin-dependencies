@@ -313,13 +313,13 @@ class Plugin_Dependencies_UI {
 	public static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$deps = Plugin_Dependencies::get_dependencies( $plugin_file );
 
-		$active_plugins = (array) get_option( 'active_plugins', array() );
-		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
-		$mu_plugins = array_keys( (array) get_mu_plugins() );
-
 		if ( empty( $deps ) ) {
 			return $actions;
 		}
+
+		$active_plugins = (array) get_option( 'active_plugins', array() );
+		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
+		$mu_plugins = array_keys( (array) get_mu_plugins() );
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
