@@ -358,15 +358,15 @@ class Plugin_Dependencies_UI {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 			if ( in_array( $dep, $unsatisfied ) ) {
 				$class = 'unsatisfied';
-				$title = __( 'Unsatisfied', 'plugin-dependencies' );
+				$title = __( 'Dependency: Unsatisfied', 'plugin-dependencies' );
 			}
 			elseif ( in_array( $dep, $unsatisfied_network ) ) {
 				$class = 'unsatisfied_network';
-				$title = __( 'Network unsatisfied', 'plugin-dependencies' );
+				$title = __( 'Dependency: Network unsatisfied', 'plugin-dependencies' );
 			}
 			else {
 				$class = 'satisfied';
-				$title = __( 'Satisfied', 'plugin-dependencies' );
+				$title = __( 'Dependency: Satisfied', 'plugin-dependencies' );
 			}
 
 			if ( empty( $plugin_ids ) ) {
