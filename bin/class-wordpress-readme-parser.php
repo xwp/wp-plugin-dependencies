@@ -42,7 +42,7 @@ class WordPress_Readme_Parser {
 				throw new Exception( "Parse error in $metadatum" );
 			}
 			list( $name, $value )  = array_slice( $metadataum_matches, 1, 2 );
-			$this->metadata[$name] = $value;
+			$this->metadata[ $name ] = $value;
 		}
 		$this->metadata['Contributors'] = preg_split( '/\s*,\s*/', $this->metadata['Contributors'] );
 		$this->metadata['Tags'] = preg_split( '/\s*,\s*/', $this->metadata['Tags'] );
@@ -58,11 +58,17 @@ class WordPress_Readme_Parser {
 			$body        = trim( array_shift( $section_match ) );
 			$subsections = array();
 
-			// @todo Parse out front matter /(.+?)(\n=\s+.+$)/s
+			// Check if there is front matter
+			if ( preg_match( '/^(\s*[^=].+?)(?=\n=|$)(.*$)/s', $body, $matches ) ) {
+				$body = $matches[1];
+				$subsection_search_area = $matches[2];
+			} else {
+				$subsection_search_area = $body;
+				$body = null;
+			}
 
 			// Parse subsections
-			if ( preg_match_all( '/(?:^|\n)= (.+?) =\n(.+?)(?=\n= |$)/s', $body, $subsection_matches, PREG_SET_ORDER ) ) {
-				$body = null;
+			if ( preg_match_all( '/(?:^|\n)= (.+?) =\n(.+?)(?=\n= |$)/s', $subsection_search_area, $subsection_matches, PREG_SET_ORDER ) ) {
 				foreach ( $subsection_matches as $subsection_match ) {
 					array_shift( $subsection_match );
 					$subsections[] = array(
@@ -94,12 +100,6 @@ class WordPress_Readme_Parser {
 
 		// Parse sections
 		$section_formatters = array(
-			'Description' => function ( $body ) use ( $params ) {
-				if ( isset( $params['travis_ci_url'] ) ) {
-					$body .= sprintf( "\n\n[![Build Status](%s.png?branch=master)](%s)", $params['travis_ci_url'], $params['travis_ci_url'] );
-				}
-				return $body;
-			},
 			'Screenshots' => function ( $body ) {
 				$body = trim( $body );
 				$new_body = '';
@@ -172,6 +172,17 @@ class WordPress_Readme_Parser {
 		foreach ( $formatted_metadata as $name => $value ) {
 			$markdown .= sprintf( "**%s:** %s  \n", $name, $value );
 		}
+
+		if ( isset( $params['travis_ci_url'] ) || isset( $params['coveralls_url'] ) ) {
+			$markdown .= "\n";
+			if ( isset( $params['travis_ci_url'] ) ) {
+				$markdown .= sprintf( '[![Build Status](%s.png?branch=master)](%s) ', $params['travis_ci_url'], $params['travis_ci_url'] );
+			}
+			if ( isset( $params['coveralls_url'] ) ) {
+				$markdown .= sprintf( '[![Build Status](%s?branch=master)](%s) ', $params['coveralls_badge_src'], $params['coveralls_url'] );
+			}
+			$markdown .= "\n";
+		}
 		$markdown .= "\n";
 
 		foreach ( $this->sections as $section ) {
@@ -181,8 +192,8 @@ class WordPress_Readme_Parser {
 			$body = $section['body'];
 
 			$body = call_user_func( $general_section_formatter, $body );
-			if ( isset( $section_formatters[$section['heading']] ) ) {
-				$body = trim( call_user_func( $section_formatters[$section['heading']], $body ) );
+			if ( isset( $section_formatters[ $section['heading'] ] ) ) {
+				$body = trim( call_user_func( $section_formatters[ $section['heading'] ], $body ) );
 			}
 
 			if ( $body ) {
