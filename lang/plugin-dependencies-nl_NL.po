@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
-"POT-Creation-Date: 2014-09-11 23:59+0100\n"
-"PO-Revision-Date: 2014-09-12 00:38+0100\n"
+"POT-Creation-Date: 2014-09-12 05:24+0100\n"
+"PO-Revision-Date: 2014-09-12 05:41+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
 "Language: nl_NL\n"
@@ -23,39 +23,47 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../plugin-dependencies.php:238
-msgid "The following plugins have also been deactivated:"
-msgstr "De volgende plugins zijn ook gedeactiveerd:"
+#: ../plugin-dependencies.php:240
+msgid ""
+"The following plugins have (also) been deactivated as a plugin they depend "
+"on has been deactivated:"
+msgstr ""
+"De volgende plugins zijn (ook) gedeactiveerd aangezien een plugin waar zij "
+"afhankelijk van zijn gedeactiveerd is:"
 
-#: ../plugin-dependencies.php:239
+#: ../plugin-dependencies.php:241
 msgid ""
 "The following plugins have been deactivated due to dependency conflicts:"
 msgstr ""
 "De volgende plugins zijn gedeactiveerd in verband met conflicterende "
 "afhankelijkheden:"
 
-#: ../plugin-dependencies.php:347
+#: ../plugin-dependencies.php:370
 msgid "Required plugins:"
 msgstr "Vereiste plugins:"
 
-#: ../plugin-dependencies.php:361
+#: ../plugin-dependencies.php:384
 msgid "Dependency: Unsatisfied"
 msgstr "Afhankelijkheid: Voldoet niet"
 
-#: ../plugin-dependencies.php:365
+#: ../plugin-dependencies.php:388
 msgid "Dependency: Network unsatisfied"
 msgstr "Afhankelijkheid: Netwerk voldoet niet"
 
-#: ../plugin-dependencies.php:369
+#: ../plugin-dependencies.php:392
 msgid "Dependency: Satisfied"
 msgstr "Afhankelijkheid: Voldoet"
 
-#: ../plugin-dependencies.php:382
+#: ../plugin-dependencies.php:407 ../plugin-dependencies.php:420
 #, php-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../plugin-dependencies.php:384
+#: ../plugin-dependencies.php:409
+msgid "network"
+msgstr ""
+
+#: ../plugin-dependencies.php:422
 msgid "must-use"
 msgstr ""
 
@@ -81,3 +89,6 @@ msgstr "scribu"
 #. Author URI of the plugin/theme
 msgid "http://scribu.net/"
 msgstr "http://scribu.net/"
+
+#~ msgid "The following plugins have also been deactivated:"
+#~ msgstr "De volgende plugins zijn ook gedeactiveerd:"
