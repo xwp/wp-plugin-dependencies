@@ -61,6 +61,7 @@ class Plugin_Dependencies {
 
 	public static function init() {
 		$all_plugins = array_merge(
+			apply_filters( 'plugin_dependencies_provider', array() ),
 			get_plugins(),
 			get_mu_plugins()
 		);
