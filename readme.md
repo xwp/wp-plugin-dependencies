@@ -3,12 +3,14 @@
 
 Plugin dependency management
 
-**Contributors:** [scribu](http://profiles.wordpress.org/scribu), [x-team](http://profiles.wordpress.org/x-team), [kucrut](http://profiles.wordpress.org/kucrut)  
+**Contributors:** [scribu](http://profiles.wordpress.org/scribu), [x-team](http://profiles.wordpress.org/x-team), [kucrut](http://profiles.wordpress.org/kucrut), [jrf](http://profiles.wordpress.org/jrf)  
 **Tags:** [plugin](http://wordpress.org/plugins/tags/plugin), [dependency](http://wordpress.org/plugins/tags/dependency)  
 **Requires at least:** 3.1  
-**Tested up to:** 3.3  
+**Tested up to:** 4.0  
 **Stable tag:** 1.2.1  
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)  
+
+[![Build Status](https://travis-ci.org/x-team/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/x-team/wp-plugin-dependencies) 
 
 ## Description ##
 
@@ -31,8 +33,6 @@ What this does:
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
 **Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
-
-[![Build Status](https://travis-ci.org/x-team/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/x-team/wp-plugin-dependencies)
 
 ## Frequently Asked Questions ##
 
@@ -75,6 +75,12 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 
 
 ## Changelog ##
+
+### 1.3 ###
+* Add Dependency Loader class. Props [kucrut](http://profiles.wordpress.org/kucrut/).
+* Clean up coding standards. Props [kucrut](http://profiles.wordpress.org/kucrut/), [jrf](http://profiles.wordpress.org/jrf/).
+* Add Dutch translation. Props [jrf](http://profiles.wordpress.org/jrf/).
+* Improve style of plugin dependency notices. Props [jrf](http://profiles.wordpress.org/jrf/).
 
 ### 1.2.1 ###
 * fixed notices. props [cfoellmann](http://profiles.wordpress.org/cfoellmann)
