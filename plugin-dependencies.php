@@ -181,7 +181,7 @@ class Plugin_Dependencies {
 		self::$active_plugins = get_option( 'active_plugins', array() );
 
 		if ( is_multisite() ) {
-			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+			self::$active_plugins = array_merge( self::$active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', array() ) ) );
 		}
 
 		self::$deactivate_cascade = array();
@@ -225,6 +225,7 @@ class Plugin_Dependencies_UI {
 
 	public static function init() {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+		add_action( 'network_admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 		add_action( 'admin_print_footer_scripts', array( __CLASS__, 'footer_script' ), 20 );
 
@@ -236,7 +237,7 @@ class Plugin_Dependencies_UI {
 		load_plugin_textdomain( 'plugin-dependencies', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
 		self::$msg = array(
-			array( 'deactivate', 'cascade', __( 'The following plugins have also been deactivated:', 'plugin-dependencies' ) ),
+			array( 'deactivate', 'cascade', __( 'The following plugins have (also) been deactivated as a plugin they depend on has been deactivated:', 'plugin-dependencies' ) ),
 			array( 'activate', 'conflicting', __( 'The following plugins have been deactivated due to dependency conflicts:', 'plugin-dependencies' ) ),
 		);
 
@@ -249,7 +250,18 @@ class Plugin_Dependencies_UI {
 
 			if ( $action == $_REQUEST['action'] ) {
 				$deactivated = call_user_func( array( 'Plugin_Dependencies', "deactivate_$type" ), (array) $_REQUEST['plugin'] );
-				set_transient( "pd_deactivate_$type", $deactivated );
+				if ( ! is_network_admin() ) {
+					set_transient( "pd_deactivate_$type", $deactivated );
+				}
+				else {
+					$value = get_transient( "pd_deactivate_$type" );
+					if ( is_array( $value ) ) {
+						$deactivated = array_merge( $value, $deactivated );
+					}
+					set_transient( "pd_deactivate_$type", $deactivated );
+
+					set_site_transient( "pd_deactivate_$type", $deactivated );
+				}
 			}
 		}
 	}
@@ -258,12 +270,14 @@ class Plugin_Dependencies_UI {
 		foreach ( self::$msg as $args ) {
 			list( $action, $type, $text ) = $args;
 
-			if ( ! isset( $_REQUEST[ $action ] ) ) {
-				continue;
+			if ( ! is_network_admin() ) {
+				$deactivated = get_transient( "pd_deactivate_$type" );
+				delete_transient( "pd_deactivate_$type" );
 			}
-
-			$deactivated = get_transient( "pd_deactivate_$type" );
-			delete_transient( "pd_deactivate_$type" );
+			else {
+				$deactivated = get_site_transient( "pd_deactivate_$type" );
+				delete_site_transient( "pd_deactivate_$type" );
+			}
 
 			if ( empty( $deactivated ) ) {
 				continue;
@@ -319,20 +333,22 @@ class Plugin_Dependencies_UI {
 		}
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
-		$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins' );
+		$network_active_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
 		$mu_plugins = array_keys( (array) get_mu_plugins() );
 
 		$unsatisfied = $unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
-			if ( ! count( array_intersect( $active_plugins, $plugin_ids ) )
-				&& ! count( array_intersect( $mu_plugins, $plugin_ids ) )
-			) {
+			if ( array_intersect( $mu_plugins, $plugin_ids ) !== array() ) {
+				continue;
+			}
+
+			if ( ! is_network_admin() && array_intersect( $active_plugins, $plugin_ids ) === array() && array_intersect( $network_active_plugins, $plugin_ids ) === array() ) {
 				$unsatisfied[] = $dep;
 			}
 
-			if ( is_multisite() && ! count( array_intersect( $network_active_plugins, $plugin_ids ) ) ) {
+			if ( is_network_admin() && array_intersect( $network_active_plugins, $plugin_ids ) === array() ) {
 				$unsatisfied_network[] = $dep;
 			}
 		}
@@ -342,7 +358,13 @@ class Plugin_Dependencies_UI {
 		}
 
 		if ( ! empty( $unsatisfied_network ) ) {
-			unset( $actions['network_activate'] );
+			// Array key was changed in WP 3.4
+			if ( isset( $actions['network_activate'] ) ) {
+				unset( $actions['network_activate'] );
+			}
+			else {
+				unset( $actions['activate'] );
+			}
 		}
 
 		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies' ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
@@ -376,8 +398,23 @@ class Plugin_Dependencies_UI {
 				$list = array();
 				foreach ( $plugin_ids as $plugin_id ) {
 					if ( isset( $all_plugins[ $plugin_id ]['Name'] ) ) {
-						$name = $all_plugins[ $plugin_id ]['Name'];
-						$url  = '#' . sanitize_title( $name );
+						if ( is_network_admin() || ! is_plugin_active_for_network( $plugin_id ) ) {
+							$name = $all_plugins[ $plugin_id ]['Name'];
+							$url  = '#' . sanitize_title( $name );
+						}
+						else {
+							$name = sprintf(
+								__( '%s (%s)', 'plugin-dependencies' ),
+								$all_plugins[ $plugin_id ]['Name'],
+								__( 'network', 'plugin-dependencies' )
+							);
+							if ( current_user_can( 'manage_network_plugins' ) ) {
+								$url  = network_admin_url( 'plugins.php' ) . '#' . sanitize_title( $name );
+							}
+							else {
+								$url = false;
+							}
+						}
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = sprintf(
 							__( '%s (%s)', 'plugin-dependencies' ),
@@ -389,7 +426,13 @@ class Plugin_Dependencies_UI {
 						$name = $plugin_id;
 						$url  = '#' . sanitize_title( $name );
 					}
-					$list[] = html( 'a', array( 'href' => $url, 'title' => $title ), $name );
+
+					if ( $url !== false ) {
+						$list[] = html( 'a', array( 'href' => $url, 'title' => $title ), $name );
+					}
+					else {
+						$list[] = html( 'span', array( 'title' => $title ), $name );
+					}
 				}
 				$name = implode( ' or ', $list );
 			}
