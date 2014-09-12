@@ -349,7 +349,7 @@ class Plugin_Dependencies_UI {
 		return $actions;
 	}
 
-	private static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
+	public static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
 		$mu_plugins  = get_mu_plugins();
 
