@@ -60,11 +60,8 @@ class Plugin_Dependencies {
 	private static $deactivate_conflicting;
 
 	public static function init() {
-		$all_plugins = array_merge(
-			apply_filters( 'plugin_dependencies_provider', array() ),
-			get_plugins(),
-			get_mu_plugins()
-		);
+		$all_plugins = array_merge( get_plugins(), get_mu_plugins() );
+		$all_plugins = apply_filters( 'plugin_dependencies_all_plugins', $all_plugins );
 
 		$plugins_by_name = array();
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
