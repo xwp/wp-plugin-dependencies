@@ -279,6 +279,7 @@ class Plugin_Dependencies_UI {
 	public static function admin_print_styles() {
 		?>
 			<style type="text/css">
+				span.dep-action { white-space: nowrap }
 				.dep-list li { list-style: disc inside none }
 				.dep-list li.unsatisfied { color: red }
 				.dep-list li.unsatisfied_network { color: orange }
@@ -344,7 +345,7 @@ class Plugin_Dependencies_UI {
 			unset( $actions['network_activate'] );
 		}
 
-		$actions['deps'] = str_replace( ' ', '&nbsp;', __( 'Required plugins:', 'plugin-dependencies' ) ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$actions['deps'] = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
 
 		return $actions;
 	}
