@@ -60,10 +60,8 @@ class Plugin_Dependencies {
 	private static $deactivate_conflicting;
 
 	public static function init() {
-		$all_plugins = array_merge(
-			get_plugins(),
-			get_mu_plugins()
-		);
+		$all_plugins = array_merge( get_plugins(), get_mu_plugins() );
+		$all_plugins = apply_filters( 'plugin_dependencies_all_plugins', $all_plugins );
 
 		$plugins_by_name = array();
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
@@ -294,10 +292,11 @@ class Plugin_Dependencies_UI {
 	public static function admin_print_styles() {
 		?>
 			<style type="text/css">
+				span.dep-action { white-space: nowrap }
 				.dep-list li { list-style: disc inside none }
-				span.deps li.unsatisfied { color: red }
-				span.deps li.unsatisfied_network { color: orange }
-				span.deps li.satisfied { color: lime }
+				.dep-list li.unsatisfied { color: red }
+				.dep-list li.unsatisfied_network { color: orange }
+				.dep-list li.satisfied { color: lime }
 			</style>
 		<?php
 	}
@@ -367,12 +366,12 @@ class Plugin_Dependencies_UI {
 			}
 		}
 
-		$actions['deps'] = __( 'Required plugins:', 'plugin-dependencies' ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$actions['deps'] = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
 
 		return $actions;
 	}
 
-	private static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
+	public static function generate_dep_list( $deps, $unsatisfied = array(), $unsatisfied_network = array() ) {
 		$all_plugins = get_plugins();
 		$mu_plugins  = get_mu_plugins();
 
