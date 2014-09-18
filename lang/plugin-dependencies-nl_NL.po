@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
-"POT-Creation-Date: 2014-09-12 05:24+0100\n"
-"PO-Revision-Date: 2014-09-12 05:41+0100\n"
+"POT-Creation-Date: 2014-09-18 05:03+0100\n"
+"PO-Revision-Date: 2014-09-18 05:06+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
 "Language: nl_NL\n"
@@ -23,7 +23,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../plugin-dependencies.php:240
+#: ../plugin-dependencies.php:542
 msgid ""
 "The following plugins have (also) been deactivated as a plugin they depend "
 "on has been deactivated:"
@@ -31,39 +31,50 @@ msgstr ""
 "De volgende plugins zijn (ook) gedeactiveerd aangezien een plugin waar zij "
 "afhankelijk van zijn gedeactiveerd is:"
 
-#: ../plugin-dependencies.php:241
+#: ../plugin-dependencies.php:543
 msgid ""
 "The following plugins have been deactivated due to dependency conflicts:"
 msgstr ""
 "De volgende plugins zijn gedeactiveerd in verband met conflicterende "
 "afhankelijkheden:"
 
-#: ../plugin-dependencies.php:370
+#: ../plugin-dependencies.php:544
+msgid ""
+"One or more plugins were not activated as their dependencies were not met at "
+"the time of activation. If the dependencies have been met in the mean time, "
+"please try and activate them again:"
+msgstr ""
+"Eén of meer plugins zijn niet geactiveerd aangezien op het moment van "
+"activatie niet aan alle afhankelijkheden voldaan werd. Als de "
+"afhankelijkheden sindsdien afgedekt zijn, probeer ze dan opnieuw te "
+"activeren:"
+
+#: ../plugin-dependencies.php:681
 msgid "Required plugins:"
 msgstr "Vereiste plugins:"
 
-#: ../plugin-dependencies.php:384
+#: ../plugin-dependencies.php:696
 msgid "Dependency: Unsatisfied"
 msgstr "Afhankelijkheid: Voldoet niet"
 
-#: ../plugin-dependencies.php:388
+#: ../plugin-dependencies.php:700
 msgid "Dependency: Network unsatisfied"
 msgstr "Afhankelijkheid: Netwerk voldoet niet"
 
-#: ../plugin-dependencies.php:392
+#: ../plugin-dependencies.php:704
 msgid "Dependency: Satisfied"
 msgstr "Afhankelijkheid: Voldoet"
 
-#: ../plugin-dependencies.php:407 ../plugin-dependencies.php:420
+#: ../plugin-dependencies.php:719 ../plugin-dependencies.php:732
 #, php-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../plugin-dependencies.php:409
+#: ../plugin-dependencies.php:721
 msgid "network"
 msgstr ""
 
-#: ../plugin-dependencies.php:422
+#: ../plugin-dependencies.php:734
 msgid "must-use"
 msgstr ""
 
