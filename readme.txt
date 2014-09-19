@@ -27,6 +27,12 @@ What this does:
 * Disables activation of *BuddyPress Debug* until both *BuddyPress* and *Debug Bar* are already activated.
 * When either *BuddyPress* or *Debug Bar* are deactivated, *BuddyPress Debug* will also be deactivated.
 
+
+> = Enriching dependency information =
+> Unfortunately, very few plugins currently contain dependency information. If you'd like to enhance the information available to this plugin, you might want to install the [Known Plugin Dependencies](https://wordpress.org/plugins/known-plugin-dependencies/) plugin which acts as an add-on to this one.
+
+
+
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
 **Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
