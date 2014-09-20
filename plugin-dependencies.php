@@ -69,6 +69,7 @@ class Plugin_Dependencies {
 	private static $blocked_activations; // will normally only be filled on bulk activations
 	private static $deactivate_cascade;
 	private static $deactivate_conflicting;
+	private static $deactivated_on_sites;
 
 	public static function init() {
 		if ( isset( self::$dependencies ) && isset( self::$provides ) ) {
@@ -296,6 +297,7 @@ class Plugin_Dependencies {
 				if ( $deactivated !== array() ) {
 					self::set_transient( $type, $deactivated, false );
 					self::add_to_recently_deactivated( $deactivated );
+					self::$deactivated_on_sites[] = get_current_blog_id();
 
 					if ( $original_network_wide === false ) {
 						add_filter( 'pre_update_option_active_plugins', array( __CLASS__, 'prevent_option_override' ) );
@@ -311,9 +313,12 @@ class Plugin_Dependencies {
 			self::$active_plugins = self::$active_network_plugins;
 			$deactivated          = call_user_func( array( __CLASS__, "deactivate_$type" ), (array) $plugin, $network_wide );
 			if ( $deactivated !== array() ) {
-				//self::set_transient( $type, $deactivated, false ); // Blog 1 - WP Core issue
 				self::set_transient( $type, $deactivated, true );
 				add_filter( 'pre_update_site_option_active_sitewide_plugins', array( __CLASS__, 'prevent_option_override_sitewide' ) );
+			}
+			
+			if ( isset( self::$deactivated_on_sites ) && self::$deactivated_on_sites !== array() ) {
+				self::set_transient( 'network', self::$deactivated_on_sites, true );
 			}
 		}
 		self::$active_plugins = null;
@@ -564,6 +569,7 @@ class Plugin_Dependencies_UI {
 			array( 'cascade', __( 'The following plugins have (also) been deactivated as a plugin they depend on has been deactivated:', 'plugin-dependencies' ) ),
 			array( 'conflicting', __( 'The following plugins have been deactivated due to dependency conflicts:', 'plugin-dependencies' ) ),
 			array( 'activate', __( 'One or more plugins were not activated as their dependencies were not met at the time of activation. If the dependencies have been met in the mean time, please try and activate them again:', 'plugin-dependencies' ) ),
+			array( 'network', __( 'The plugin(s) which was just deactivated provided a dependency for other plugins. Dependent plugin(s) on the following sites in your network have been deactivated:', 'plugin-dependencies' ) ),
 		);
 	}
 
@@ -589,11 +595,26 @@ class Plugin_Dependencies_UI {
 					continue;
 				}
 
+				if( $type !== 'network' ) {
 				echo html(
 					'div',
 					array( 'class' => 'updated' ),
 						html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
 				); // xss ok
+			}
+				else {
+					$dep_list = '';
+					foreach( $deactivated as $blog_id ) {
+						$details = get_blog_details( $blog_id, false );
+						$dep_list .= html( 'li', compact( 'class' ), html( 'a', array( 'href' => get_admin_url( $blog_id, 'plugins.php?plugin_status=recently_activated' ) ), $details->blogname ) );
+					}
+
+					echo html(
+						'div',
+						array( 'class' => 'updated' ),
+						html( 'p', $text, html( 'ul', array( 'class' => 'dep-list' ), $dep_list ) )
+					);
+				}
 			}
 		}
 	}
