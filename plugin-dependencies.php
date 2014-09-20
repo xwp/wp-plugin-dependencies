@@ -316,7 +316,7 @@ class Plugin_Dependencies {
 				self::set_transient( $type, $deactivated, true );
 				add_filter( 'pre_update_site_option_active_sitewide_plugins', array( __CLASS__, 'prevent_option_override_sitewide' ) );
 			}
-			
+
 			if ( isset( self::$deactivated_on_sites ) && self::$deactivated_on_sites !== array() ) {
 				self::set_transient( 'network', self::$deactivated_on_sites, true );
 			}
@@ -595,17 +595,18 @@ class Plugin_Dependencies_UI {
 					continue;
 				}
 
-				if( $type !== 'network' ) {
-				echo html(
-					'div',
-					array( 'class' => 'updated' ),
-						html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
-				); // xss ok
-			}
+				if ( $type !== 'network' ) {
+					echo html(
+						'div',
+						array( 'class' => 'updated' ),
+							html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
+					); // xss ok
+				}
 				else {
 					$dep_list = '';
-					foreach( $deactivated as $blog_id ) {
-						$details = get_blog_details( $blog_id, false );
+					$class    = 'unsatisfied';
+					foreach ( $deactivated as $blog_id ) {
+						$details   = get_blog_details( $blog_id, false );
 						$dep_list .= html( 'li', compact( 'class' ), html( 'a', array( 'href' => get_admin_url( $blog_id, 'plugins.php?plugin_status=recently_activated' ) ), $details->blogname ) );
 					}
 
@@ -613,7 +614,7 @@ class Plugin_Dependencies_UI {
 						'div',
 						array( 'class' => 'updated' ),
 						html( 'p', $text, html( 'ul', array( 'class' => 'dep-list' ), $dep_list ) )
-					);
+					); // xss ok
 				}
 			}
 		}
