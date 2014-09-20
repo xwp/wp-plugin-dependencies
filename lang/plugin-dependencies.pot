@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
-"POT-Creation-Date: 2014-09-18 05:03+0100\n"
-"PO-Revision-Date: 2014-09-18 05:04+0100\n"
+"POT-Creation-Date: 2014-09-20 16:16+0100\n"
+"PO-Revision-Date: 2014-09-20 16:17+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
 "Language: English\n"
@@ -23,50 +23,57 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../plugin-dependencies.php:542
+#: ../plugin-dependencies.php:569
 msgid ""
 "The following plugins have (also) been deactivated as a plugin they depend "
 "on has been deactivated:"
 msgstr ""
 
-#: ../plugin-dependencies.php:543
+#: ../plugin-dependencies.php:570
 msgid ""
 "The following plugins have been deactivated due to dependency conflicts:"
 msgstr ""
 
-#: ../plugin-dependencies.php:544
+#: ../plugin-dependencies.php:571
 msgid ""
 "One or more plugins were not activated as their dependencies were not met at "
 "the time of activation. If the dependencies have been met in the mean time, "
 "please try and activate them again:"
 msgstr ""
 
-#: ../plugin-dependencies.php:681
+#: ../plugin-dependencies.php:572
+msgid ""
+"The plugin(s) which was just deactivated provided a dependency for other "
+"plugins. Dependent plugin(s) on the following sites in your network have "
+"been deactivated:"
+msgstr ""
+
+#: ../plugin-dependencies.php:721
 msgid "Required plugins:"
 msgstr ""
 
-#: ../plugin-dependencies.php:696
+#: ../plugin-dependencies.php:736
 msgid "Dependency: Unsatisfied"
 msgstr ""
 
-#: ../plugin-dependencies.php:700
+#: ../plugin-dependencies.php:740
 msgid "Dependency: Network unsatisfied"
 msgstr ""
 
-#: ../plugin-dependencies.php:704
+#: ../plugin-dependencies.php:744
 msgid "Dependency: Satisfied"
 msgstr ""
 
-#: ../plugin-dependencies.php:719 ../plugin-dependencies.php:732
+#: ../plugin-dependencies.php:759 ../plugin-dependencies.php:772
 #, php-format
 msgid "%s (%s)"
 msgstr ""
 
-#: ../plugin-dependencies.php:721
+#: ../plugin-dependencies.php:761
 msgid "network"
 msgstr ""
 
-#: ../plugin-dependencies.php:734
+#: ../plugin-dependencies.php:774
 msgid "must-use"
 msgstr ""
 
