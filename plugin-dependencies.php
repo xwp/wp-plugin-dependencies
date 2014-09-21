@@ -71,8 +71,8 @@ class Plugin_Dependencies {
 	private static $deactivate_conflicting;
 	private static $deactivated_on_sites;
 
-	public static function init() {
-		if ( isset( self::$dependencies ) && isset( self::$provides ) ) {
+	public static function init( $force = false ) {
+		if ( ( isset( self::$dependencies ) && isset( self::$provides ) ) && $force === false ) {
 			return;
 		}
 
