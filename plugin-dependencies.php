@@ -88,18 +88,23 @@ class Plugin_Dependencies {
 		}
 
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
-			// @todo [JRF => whomever] The array subkey is being overwritten straight away. What gives ?
-			self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] );
-			self::$provides[ $plugin ][] = $plugin;
+			self::$provides[ $plugin ] = '';
+			if ( ! empty( $plugin_data['Provides'] ) ) {
+				// @todo [JRF => whomever] The array subkey is being overwritten straight away. What gives ?
+				self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] );
+				self::$provides[ $plugin ][] = $plugin;
+			}
 
 			$deps = array();
 
-			foreach ( self::parse_field( $plugin_data['Depends'] ) as $dep ) {
-				if ( isset( $plugins_by_name[ $dep ] ) ) {
-					$dep = $plugins_by_name[ $dep ];
+			if ( ! empty( $plugin_data['Depends'] ) ) {
+				foreach ( self::parse_field( $plugin_data['Depends'] ) as $dep ) {
+					if ( isset( $plugins_by_name[ $dep ] ) ) {
+						$dep = $plugins_by_name[ $dep ];
+					}
+	
+					$deps[] = $dep;
 				}
-
-				$deps[] = $dep;
 			}
 
 			self::$dependencies[ $plugin ] = $deps;
