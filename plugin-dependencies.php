@@ -102,7 +102,7 @@ class Plugin_Dependencies {
 					if ( isset( $plugins_by_name[ $dep ] ) ) {
 						$dep = $plugins_by_name[ $dep ];
 					}
-	
+
 					$deps[] = $dep;
 				}
 			}
