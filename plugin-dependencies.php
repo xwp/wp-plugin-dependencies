@@ -91,8 +91,8 @@ class Plugin_Dependencies {
 			self::$provides[ $plugin ] = array();
 			if ( ! empty( $plugin_data['Provides'] ) ) {
 				self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] ); // returns array
-				self::$provides[ $plugin ][] = $plugin;
 			}
+			self::$provides[ $plugin ][] = $plugin;
 
 			$deps = array();
 
