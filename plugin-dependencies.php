@@ -88,10 +88,9 @@ class Plugin_Dependencies {
 		}
 
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
-			self::$provides[ $plugin ] = '';
+			self::$provides[ $plugin ] = array();
 			if ( ! empty( $plugin_data['Provides'] ) ) {
-				// @todo [JRF => whomever] The array subkey is being overwritten straight away. What gives ?
-				self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] );
+				self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] ); // returns array
 				self::$provides[ $plugin ][] = $plugin;
 			}
 
