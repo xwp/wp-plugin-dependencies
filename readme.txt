@@ -82,7 +82,7 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 * Add Dependency Loader class. Props [kucrut](http://profiles.wordpress.org/kucrut/).
 
 * Make it work with bulk actions. Props [jrf](http://profiles.wordpress.org/jrf/).
-* Usability: Remove bulk action checkboxes for plugins with unsatisfied dependencies on single site plugins page within a network. Props [jrf](http://profiles.wordpress.org/jrf/).
+	* Usability: Remove bulk action checkboxes for plugins with unsatisfied dependencies on single site plugins page within a network. Props [jrf](http://profiles.wordpress.org/jrf/).
 
 * Guard dependencies even when a plugin is (de)activated outside of the plugins page context. Props [jrf](http://profiles.wordpress.org/jrf/).
 
@@ -123,3 +123,7 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 * initial release
 * [more info](http://scribu.net/wordpress/plugin-dependencies/pd-1-0.html)
 
+== Upgrade Notice ==
+
+= 1.3 =
+* Upgrade highly recommended - Plugin now fully compatible with multisite and dependency management will now also work outside of the plugins page context, including for bulk actions.
