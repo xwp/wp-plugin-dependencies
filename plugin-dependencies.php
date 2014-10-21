@@ -723,7 +723,9 @@ class Plugin_Dependencies_UI {
 			self::$unsatisfied[] = 'checkbox_' . md5( $plugin_data['Name'] );
 		}
 
-		$actions['deps'] = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$deps = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) );
+		$deps .= '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$actions['deps'] = $deps;
 
 		return $actions;
 	}
