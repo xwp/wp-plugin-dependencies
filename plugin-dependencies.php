@@ -72,7 +72,7 @@ class Plugin_Dependencies {
 	private static $deactivated_on_sites;
 
 	public static function init( $force = false ) {
-		if ( ( isset( self::$dependencies ) && isset( self::$provides ) ) && $force === false ) {
+		if ( ( isset( self::$dependencies ) && isset( self::$provides ) ) && false === $force ) {
 			return;
 		}
 
@@ -185,7 +185,7 @@ class Plugin_Dependencies {
 	 * @param bool   $network_wide Whether this is a network or single site activation
 	 */
 	public static function check_activation( $plugin, $network_wide = false ) {
-		if ( $network_wide === true ) {
+		if ( true === $network_wide ) {
 			self::$active_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
 		}
 		else {
@@ -198,7 +198,7 @@ class Plugin_Dependencies {
 
 		// Allow for plugins which are being activated in the same bulk activation action
 		$bulk = array();
-		if ( ( isset( $_POST['action'] ) && $_POST['action'] === 'activate-selected' ) && ( isset( $_POST['checked'] ) && is_array( $_POST['checked'] ) ) ) {
+		if ( ( isset( $_POST['action'] ) && 'activate-selected' === $_POST['action'] ) && ( isset( $_POST['checked'] ) && is_array( $_POST['checked'] ) ) ) {
 			$bulk = $_POST['checked'];
 		}
 
@@ -229,7 +229,7 @@ class Plugin_Dependencies {
 				add_filter( 'pre_update_option_active_plugins', array( __CLASS__, 'prevent_activation' ), 10, 2 );
 			}
 
-			if ( ! empty( self::$blocked_activations ) && has_filter( 'pre_update_option_recently_activated', array( __CLASS__, 'override_recently_activated' ) ) === false ) {
+			if ( ! empty( self::$blocked_activations ) && false === has_filter( 'pre_update_option_recently_activated', array( __CLASS__, 'override_recently_activated' ) ) ) {
 				add_filter( 'pre_update_option_recently_activated', array( __CLASS__, 'override_recently_activated' ) );
 			}
 		}
@@ -286,12 +286,12 @@ class Plugin_Dependencies {
 	 */
 	private static function check_dependencies( $type, $plugin, $network_wide = false, $original_network_wide = false ) {
 
-		if ( ! is_multisite() || $network_wide === false ) {
+		if ( ! is_multisite() || false === $network_wide ) {
 			self::$active_plugins = get_option( 'active_plugins', array() );
 
 			/* No need to execute check when a plugin is network deactivated, but still activated for
 			   the individual site */
-			if ( self::$active_plugins !== array() && ( $original_network_wide === false || ! in_array( $plugin, self::$active_plugins, true ) ) ) {
+			if ( array() !== self::$active_plugins && ( false === $original_network_wide || ! in_array( $plugin, self::$active_plugins, true ) ) ) {
 
 				if ( is_multisite() ) {
 					self::$active_plugins = array_merge( self::$active_plugins, self::$active_network_plugins );
@@ -303,7 +303,7 @@ class Plugin_Dependencies {
 					self::add_to_recently_deactivated( $deactivated );
 					self::$deactivated_on_sites[] = get_current_blog_id();
 
-					if ( $original_network_wide === false ) {
+					if ( false === $original_network_wide ) {
 						add_filter( 'pre_update_option_active_plugins', array( __CLASS__, 'prevent_option_override' ) );
 					}
 				}
@@ -404,7 +404,7 @@ class Plugin_Dependencies {
 
 		// Do not notify about plugins which are requested to be deactivated anyway within the same bulk deactivation request
 		$bulk = array();
-		if ( ( isset( $_POST['action2'] ) && $_POST['action2'] === 'deactivate-selected' ) && ( isset( $_POST['checked'] ) && is_array( $_POST['checked'] ) ) ) {
+		if ( ( isset( $_POST['action2'] ) && 'deactivate-selected' === $_POST['action2'] ) && ( isset( $_POST['checked'] ) && is_array( $_POST['checked'] ) ) ) {
 			$bulk = $_POST['checked'];
 		}
 		self::$deactivate_cascade = array_diff( self::$deactivate_cascade, $bulk );
@@ -447,7 +447,7 @@ class Plugin_Dependencies {
 	 * @param bool   $network      Whether to set the transient for the network or for an individual site
 	 */
 	protected static function set_transient( $type, $deactivated, $network = false ) {
-		if ( $network !== true ) {
+		if ( true !== $network ) {
 			$value = get_transient( "pd_deactivate_$type" );
 			if ( is_array( $value ) ) {
 				$deactivated = array_merge( $value, $deactivated );
@@ -599,7 +599,7 @@ class Plugin_Dependencies_UI {
 					continue;
 				}
 
-				if ( $type !== 'network' ) {
+				if ( 'network' !== $type ) {
 					echo html(
 						'div',
 						array( 'class' => 'updated' ),
@@ -723,7 +723,9 @@ class Plugin_Dependencies_UI {
 			self::$unsatisfied[] = 'checkbox_' . md5( $plugin_data['Name'] );
 		}
 
-		$actions['deps'] = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) ) . '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$deps = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) );
+		$deps .= '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
+		$actions['deps'] = $deps;
 
 		return $actions;
 	}
@@ -784,7 +786,7 @@ class Plugin_Dependencies_UI {
 						$url  = '#' . sanitize_title( $name );
 					}
 
-					if ( $url !== false ) {
+					if ( false !== $url ) {
 						$list[] = html( 'a', array( 'href' => $url, 'title' => $title ), $name );
 					}
 					else {
