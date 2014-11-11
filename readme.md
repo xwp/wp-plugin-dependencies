@@ -10,6 +10,8 @@ Plugin dependency management
 **Stable tag:** 1.2.1  
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)  
 
+[![Build Status](https://travis-ci.org/xwp/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/xwp/wp-plugin-dependencies) 
+
 ## Description ##
 
 This meta-plugin allows regular plugins to specify other plugins that they depend upon.
@@ -29,8 +31,6 @@ What this does:
 * When either *BuddyPress* or *Debug Bar* are deactivated, *BuddyPress Debug* will also be deactivated.
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
-
-[![Build Status](https://travis-ci.org/x-team/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/x-team/wp-plugin-dependencies)
 
 ## Frequently Asked Questions ##
 
