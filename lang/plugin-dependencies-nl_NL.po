@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: Plugin Dependencies\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/plugin-dependencies\n"
 "POT-Creation-Date: 2014-09-20 16:16+0100\n"
-"PO-Revision-Date: 2014-09-20 16:17+0100\n"
+"PO-Revision-Date: 2014-09-20 16:19+0100\n"
 "Last-Translator: EJ Reinders Folmer <poedit_nospam@adviesenzo.nl>\n"
 "Language-Team: \n"
-"Language: English\n"
+"Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,11 +28,15 @@ msgid ""
 "The following plugins have (also) been deactivated as a plugin they depend "
 "on has been deactivated:"
 msgstr ""
+"De volgende plugins zijn (ook) gedeactiveerd aangezien een plugin waar zij "
+"afhankelijk van zijn gedeactiveerd is:"
 
 #: ../plugin-dependencies.php:570
 msgid ""
 "The following plugins have been deactivated due to dependency conflicts:"
 msgstr ""
+"De volgende plugins zijn gedeactiveerd in verband met conflicterende "
+"afhankelijkheden:"
 
 #: ../plugin-dependencies.php:571
 msgid ""
@@ -40,6 +44,10 @@ msgid ""
 "the time of activation. If the dependencies have been met in the mean time, "
 "please try and activate them again:"
 msgstr ""
+"Eén of meer plugins zijn niet geactiveerd aangezien op het moment van "
+"activatie niet aan alle afhankelijkheden voldaan werd. Als de "
+"afhankelijkheden sindsdien afgedekt zijn, probeer ze dan opnieuw te "
+"activeren:"
 
 #: ../plugin-dependencies.php:572
 msgid ""
@@ -47,31 +55,34 @@ msgid ""
 "plugins. Dependent plugin(s) on the following sites in your network have "
 "been deactivated:"
 msgstr ""
+"De plugin die zojuist gedactiveerd is, leverde een afhankelijkheid aan "
+"andere plugins. Afhankelijke plugin(s) op de volgende sites in het network "
+"zijn gedeactiveerd:"
 
 #: ../plugin-dependencies.php:721
 msgid "Required plugins:"
-msgstr ""
+msgstr "Vereiste plugins:"
 
 #: ../plugin-dependencies.php:736
 msgid "Dependency: Unsatisfied"
-msgstr ""
+msgstr "Afhankelijkheid: Voldoet niet"
 
 #: ../plugin-dependencies.php:740
 msgid "Dependency: Network unsatisfied"
-msgstr ""
+msgstr "Afhankelijkheid: Netwerk voldoet niet"
 
 #: ../plugin-dependencies.php:744
 msgid "Dependency: Satisfied"
-msgstr ""
+msgstr "Afhankelijkheid: Voldoet"
 
 #: ../plugin-dependencies.php:759 ../plugin-dependencies.php:772
 #, php-format
 msgid "%s (%s)"
-msgstr ""
+msgstr "%s (%s)"
 
 #: ../plugin-dependencies.php:761
 msgid "network"
-msgstr ""
+msgstr "netwerk"
 
 #: ../plugin-dependencies.php:774
 msgid "must-use"
@@ -79,21 +90,26 @@ msgstr ""
 
 #. Plugin Name of the plugin/theme
 msgid "Plugin Dependencies"
-msgstr ""
+msgstr "Plugin Dependencies"
 
 #. Plugin URI of the plugin/theme
 msgid "http://scribu.net/wordpress/plugin-dependencies"
-msgstr ""
+msgstr "http://scribu.net/wordpress/plugin-dependencies"
 
 #. Description of the plugin/theme
 msgid ""
 "Prevent activating plugins that don't have all their dependencies satisfied"
 msgstr ""
+"Voorkom het activeren van plugins als niet alle afhankelijkheden afgedekt "
+"zijn"
 
 #. Author of the plugin/theme
 msgid "scribu"
-msgstr ""
+msgstr "scribu"
 
 #. Author URI of the plugin/theme
 msgid "http://scribu.net/"
-msgstr ""
+msgstr "http://scribu.net/"
+
+#~ msgid "The following plugins have also been deactivated:"
+#~ msgstr "De volgende plugins zijn ook gedeactiveerd:"
