@@ -603,7 +603,7 @@ class Plugin_Dependencies_UI {
 					echo html(
 						'div',
 						array( 'class' => 'updated' ),
-							html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
+						html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
 					); // xss ok
 				}
 				else {
