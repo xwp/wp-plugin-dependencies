@@ -3,7 +3,7 @@
 
 Plugin dependency management
 
-**Contributors:** [scribu](http://profiles.wordpress.org/scribu), [x-team](http://profiles.wordpress.org/x-team), [kucrut](http://profiles.wordpress.org/kucrut), [jrf](http://profiles.wordpress.org/jrf)  
+**Contributors:** [scribu](http://profiles.wordpress.org/scribu), [xwp](http://profiles.wordpress.org/xwp), [kucrut](http://profiles.wordpress.org/kucrut), [jrf](http://profiles.wordpress.org/jrf)  
 **Tags:** [plugin](http://wordpress.org/plugins/tags/plugin), [dependency](http://wordpress.org/plugins/tags/dependency)  
 **Requires at least:** 3.1  
 **Tested up to:** 4.0  
@@ -38,7 +38,7 @@ What this does:
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
-**Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
+**Development of this plugin is done [on GitHub](https://github.com/xwp/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/xwp/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
 
 ## Frequently Asked Questions ##
 

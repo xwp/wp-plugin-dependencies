@@ -1,5 +1,5 @@
 === Plugin Dependencies ===
-Contributors: scribu, X-team, kucrut, jrf
+Contributors: scribu, xwp, kucrut, jrf
 Tags: plugin, dependency
 Requires at least: 3.1
 Tested up to: 4.0
@@ -35,7 +35,7 @@ What this does:
 
 Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
-**Development of this plugin is done [on GitHub](https://github.com/x-team/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/x-team/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
+**Development of this plugin is done [on GitHub](https://github.com/xwp/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/xwp/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
 
 == Frequently Asked Questions ==
 
