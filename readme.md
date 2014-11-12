@@ -7,7 +7,7 @@ Plugin dependency management
 **Tags:** [plugin](http://wordpress.org/plugins/tags/plugin), [dependency](http://wordpress.org/plugins/tags/dependency)  
 **Requires at least:** 3.1  
 **Tested up to:** 4.0  
-**Stable tag:** 1.2.1  
+**Stable tag:** trunk (master)  
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)  
 
 [![Build Status](https://travis-ci.org/xwp/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/xwp/wp-plugin-dependencies) 
