@@ -10,7 +10,7 @@ Plugin dependency management
 **Stable tag:** trunk (master)  
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)  
 
-[![Build Status](https://travis-ci.org/x-team/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/x-team/wp-plugin-dependencies) 
+[![Build Status](https://travis-ci.org/xwp/wp-plugin-dependencies.png?branch=master)](https://travis-ci.org/xwp/wp-plugin-dependencies) 
 
 ## Description ##
 
