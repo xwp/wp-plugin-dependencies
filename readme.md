@@ -32,18 +32,16 @@ What this does:
 
 
 > = Enriching dependency information =
+>
 > Unfortunately, very few plugins currently contain dependency information. If you'd like to enhance the information available to this plugin, you might want to install the [Known Plugin Dependencies](https://wordpress.org/plugins/known-plugin-dependencies/) plugin which acts as an add-on to this one.
+
+
+
+Links: [Plugin News](http://scribu.net/wordpress/plugin-dependencies) | [Author's Site](http://scribu.net)
 
 **Development of this plugin is done [on GitHub](https://github.com/xwp/wp-plugin-dependencies). Pull requests welcome. Please see [issues](https://github.com/xwp/wp-plugin-dependencies/issues) reported there before going to the plugin forum.**
 
 ## Frequently Asked Questions ##
-
-### Error on activation: "Parse error: syntax error, unexpected..." ###
-Make sure your host is running PHP 5. The only foolproof way to do this is to add this line to wp-config.php (after the opening `<?php` tag):
-
-`
-var_dump(PHP_VERSION);
-`
 
 ### What happens if a user doesn't have Plugin Dependencies installed? ###
 Nothing. The *Depends:* header will simply be ignored.
@@ -82,7 +80,7 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 * Add Dependency Loader class. Props [kucrut](http://profiles.wordpress.org/kucrut/).
 
 * Make it work with bulk actions. Props [jrf](http://profiles.wordpress.org/jrf/).
-	* Usability: Remove bulk action checkboxes for plugins with unsatisfied dependencies on single site plugins page within a network. Props [jrf](http://profiles.wordpress.org/jrf/).
+	* Usability: Remove bulk action checkboxes for plugins with unsatisfied dependencies on single site plugins page within a network.
 
 * Guard dependencies even when a plugin is (de)activated outside of the plugins page context. Props [jrf](http://profiles.wordpress.org/jrf/).
 
@@ -95,7 +93,7 @@ Besides being more robust, the *Provides:* header allows multiple plugins to imp
 	* Usability: On single site plugin page in a multisite network: added a "network" textual indicator for dependencies which were met by a network activated plugin.
 	* Usability: On single site plugin page in a multisite network: the required plugin names now only link to the plugin if the current user can activate that plugin.
 	* Usability: Improved information to single site admins when dependent plugins have been deactivated because a required plugin has been network deactivated - show all deactivated plugins since last admin login, not just what happened in the last change round.
-	* Usability: Notifications about deactivated plugins are now shown on any admin page which will help admins notice changes made by this plugin earlier in case of a network deactivation. Props [jrf](http://profiles.wordpress.org/jrf/).
+	* Usability: Notifications about deactivated plugins are now shown on any admin page which will help admins notice changes made by this plugin earlier in case of a network deactivation.
 
 * Clean up coding standards. Props [kucrut](http://profiles.wordpress.org/kucrut/), [jrf](http://profiles.wordpress.org/jrf/).
 * Improve style of plugin dependency notices. Props [jrf](http://profiles.wordpress.org/jrf/).
