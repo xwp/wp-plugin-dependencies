@@ -18,12 +18,12 @@ This meta-plugin allows regular plugins to specify other plugins that they depen
 
 Example:
 
-`
+```php
 /*
 Plugin Name: BuddyPress Debug
 Depends: BuddyPress, Debug Bar
 */
-`
+```
 
 What this does:
 
@@ -48,21 +48,21 @@ Yes, the dependency chain can go as deep as you want.
 ### Defining virtual packages ###
 Say you have some useful functions that you would like to package up as a library plugin:
 
-`
+```php
 /*
 Plugin Name: Facebook Lib
 Provides: lib-facebook
 */
-`
+```
 
 Now, dependant plugins can specify 'lib-facebook' as a dependency:
 
-`
+```php
 /*
 Plugin Name: Cool Facebook Plugin
 Depends: lib-facebook
 */
-`
+```
 
 Besides being more robust, the *Provides:* header allows multiple plugins to implement the same set of functionality and be used interchangeably.
 
