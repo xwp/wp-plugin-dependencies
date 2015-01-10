@@ -666,7 +666,7 @@ class Plugin_Dependencies_UI {
 						$self.attr('id', hash[title]);
 					});
 		<?php
-		if ( is_multisite() && ! is_network_admin() ):
+		if ( is_multisite() && ! is_network_admin() ) :
 			?>
 					$('<?php echo esc_attr( $unsatisfied ); ?>').remove();
 			<?php
