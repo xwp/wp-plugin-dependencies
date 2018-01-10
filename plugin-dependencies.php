@@ -133,9 +133,9 @@ class Plugin_Dependencies {
 
 		if ( ! isset( self::$dependencies[ $plugin_id ] ) ) {
 			return array();
-		} else {
-			return self::$dependencies[ $plugin_id ];
 		}
+
+		return self::$dependencies[ $plugin_id ];
 	}
 
 	/**
@@ -151,9 +151,9 @@ class Plugin_Dependencies {
 
 		if ( ! isset( self::$provides[ $plugin_id ] ) ) {
 			return array();
-		} else {
-			return self::$provides[ $plugin_id ];
 		}
+
+		return self::$provides[ $plugin_id ];
 	}
 
 	/**
@@ -781,10 +781,10 @@ class Plugin_Dependencies_UI {
 								$all_plugins[ $plugin_id ]['Name'],
 								__( 'network', 'plugin-dependencies' )
 							);
+
+							$url = false;
 							if ( current_user_can( 'manage_network_plugins' ) ) {
-								$url  = network_admin_url( 'plugins.php' ) . '#' . sanitize_title( $all_plugins[ $plugin_id ]['Name'] );
-							} else {
-								$url = false;
+								$url = network_admin_url( 'plugins.php' ) . '#' . sanitize_title( $all_plugins[ $plugin_id ]['Name'] );
 							}
 						}
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
