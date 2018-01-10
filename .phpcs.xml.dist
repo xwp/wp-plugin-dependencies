@@ -16,7 +16,11 @@
 	And add configuration properties for a few sniffs.
 	#############################################################################
 	-->
-	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress-Extra">
+		<!-- Temporarily exclude this notice so this can be investigated
+			 and if necessary addressed. -->
+		<exclude name="WordPress.Security.NonceVerification.NoNonceVerification"/>
+	</rule>
 
 	<!-- The value of the below config variable should be in-line with the
 		 "requires at least" version in the readme. -->
@@ -45,6 +49,7 @@
 			<property name="strict_class_file_names" value="false"/>
 		</properties>
 	</rule>
+
 
 	<!--
 	#############################################################################
