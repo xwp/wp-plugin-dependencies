@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<ruleset name="PluginDependenciesCS">
+	<description>Custom PHPCS ruleset for the WP Plugin Dependencies plugin.</description>
+
+	<file>./plugin-dependencies.php</file>
+
+	<!-- Show progress, show the error codes for each message (source). -->
+	<arg value="sp"/>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+	<!--
+	#############################################################################
+	SNIFF AGAINST THE WordPress-Extra RULESET
+	And add configuration properties for a few sniffs.
+	#############################################################################
+	-->
+	<rule ref="WordPress-Extra"/>
+
+	<!-- The value of the below config variable should be in-line with the
+		 "requires at least" version in the readme. -->
+	<config name="minimum_supported_wp_version" value="3.1"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="plugin-dependencies"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<!-- Provide the prefixes to look for. -->
+			<property name="prefixes" type="array">
+				<element value="Plugin_Dependencies"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Renaming the main file after publication would deactivate the plugin. -->
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="strict_class_file_names" value="false"/>
+		</properties>
+	</rule>
+
+	<!--
+	#############################################################################
+	SNIFF FOR PHP CROSS-VERSION COMPATIBILITY
+	Exclude a few select errorcodes for things back-filled by WP Core.
+	#############################################################################
+	-->
+
+	<config name="testVersion" value="5.2-"/>
+	<rule ref="PHPCompatibility"/>
+
+</ruleset>
