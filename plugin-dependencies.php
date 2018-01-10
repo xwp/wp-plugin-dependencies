@@ -536,9 +536,11 @@ class Plugin_Dependencies {
 	 */
 	public static function undo_activation_actions( $plugin, $network_wide ) {
 		remove_action( current_filter(), array( __CLASS__, __FUNCTION__ ) );
+		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- using WP core hooks.
 		do_action( 'deactivate_plugin', $plugin, $network_wide );
 		do_action( 'deactivate_' . $plugin, $network_wide );
 		do_action( 'deactivated_plugin', $plugin, $network_wide );
+		// phpcs:enable
 	}
 }
 
