@@ -410,7 +410,7 @@ class Plugin_Dependencies {
 
 		self::$deactivate_cascade = array();
 
-		self::_cascade( $to_deactivate, $network_deactivate );
+		self::cascade( $to_deactivate, $network_deactivate );
 
 		/*
 		 * Do not notify about plugins which are requested to be deactivated anyway
@@ -425,7 +425,7 @@ class Plugin_Dependencies {
 		return self::$deactivate_cascade;
 	}
 
-	private static function _cascade( $to_deactivate, $network_deactivate = false ) {
+	private static function cascade( $to_deactivate, $network_deactivate = false ) {
 		$to_deactivate_deps = array();
 		foreach ( $to_deactivate as $plugin_id ) {
 			$to_deactivate_deps = array_merge( $to_deactivate_deps, self::get_provided( $plugin_id ) );
@@ -446,7 +446,7 @@ class Plugin_Dependencies {
 
 		self::$deactivate_cascade = array_merge( self::$deactivate_cascade, $found );
 
-		self::_cascade( $found, $network_deactivate );
+		self::cascade( $found, $network_deactivate );
 
 		deactivate_plugins( $found, false, $network_deactivate );
 	}
