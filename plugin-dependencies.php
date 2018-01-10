@@ -616,23 +616,23 @@ class Plugin_Dependencies_UI {
 				}
 
 				if ( 'network' !== $type ) {
-					echo html(
+					echo self::html(
 						'div',
 						array( 'class' => 'updated' ),
-						html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
+						self::html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
 					); // xss ok
 				} else {
 					$dep_list = '';
 					$class    = 'unsatisfied';
 					foreach ( $deactivated as $blog_id ) {
 						$details   = get_blog_details( $blog_id, false );
-						$dep_list .= html( 'li', compact( 'class' ), html( 'a', array( 'href' => get_admin_url( $blog_id, 'plugins.php?plugin_status=recently_activated' ) ), $details->blogname ) );
+						$dep_list .= self::html( 'li', compact( 'class' ), self::html( 'a', array( 'href' => get_admin_url( $blog_id, 'plugins.php?plugin_status=recently_activated' ) ), $details->blogname ) );
 					}
 
-					echo html(
+					echo self::html(
 						'div',
 						array( 'class' => 'updated' ),
-						html( 'p', $text, html( 'ul', array( 'class' => 'dep-list' ), $dep_list ) )
+						self::html( 'p', $text, self::html( 'ul', array( 'class' => 'dep-list' ), $dep_list ) )
 					); // xss ok
 				}
 			}
@@ -738,7 +738,7 @@ class Plugin_Dependencies_UI {
 			self::$unsatisfied[] = 'checkbox_' . md5( $plugin_data['Name'] );
 		}
 
-		$dep_list        = html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) );
+		$dep_list        = self::html( 'span', array( 'class' => 'dep-action' ), __( 'Required plugins:', 'plugin-dependencies' ) );
 		$dep_list       .= '<br>' . self::generate_dep_list( $deps, $unsatisfied, $unsatisfied_network );
 		$actions['deps'] = $dep_list;
 
@@ -765,7 +765,7 @@ class Plugin_Dependencies_UI {
 			}
 
 			if ( empty( $plugin_ids ) ) {
-				$name = html( 'span', esc_html( $dep ) );
+				$name = self::html( 'span', esc_html( $dep ) );
 			} else {
 				$list = array();
 				foreach ( $plugin_ids as $plugin_id ) {
@@ -802,7 +802,7 @@ class Plugin_Dependencies_UI {
 					}
 
 					if ( false !== $url ) {
-						$list[] = html(
+						$list[] = self::html(
 							'a',
 							array(
 								'href'  => $url,
@@ -811,7 +811,7 @@ class Plugin_Dependencies_UI {
 							$name
 						);
 					} else {
-						$list[] = html(
+						$list[] = self::html(
 							'span',
 							array(
 								'title' => $title,
@@ -823,16 +823,13 @@ class Plugin_Dependencies_UI {
 				$name = implode( ' or ', $list );
 			}
 
-			$dep_list .= html( 'li', compact( 'class' ), $name );
+			$dep_list .= self::html( 'li', compact( 'class' ), $name );
 		}
 
-		return html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
+		return self::html( 'ul', array( 'class' => 'dep-list' ), $dep_list );
 	}
-}
 
-
-if ( ! function_exists( 'html' ) ) :
-	function html( $tag ) {
+	public static function html( $tag ) {
 		$args = func_get_args();
 
 		$tag = array_shift( $args );
@@ -863,4 +860,5 @@ if ( ! function_exists( 'html' ) ) :
 
 		return "<{$tag}>{$content}</{$closing}>";
 	}
-endif;
+
+}
