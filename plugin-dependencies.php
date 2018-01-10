@@ -90,7 +90,7 @@ class Plugin_Dependencies {
 		foreach ( $all_plugins as $plugin => $plugin_data ) {
 			self::$provides[ $plugin ] = array();
 			if ( ! empty( $plugin_data['Provides'] ) ) {
-				self::$provides[ $plugin ]   = self::parse_field( $plugin_data['Provides'] ); // returns array
+				self::$provides[ $plugin ] = self::parse_field( $plugin_data['Provides'] ); // returns array
 			}
 			self::$provides[ $plugin ][] = $plugin;
 
@@ -168,7 +168,7 @@ class Plugin_Dependencies {
 		} else {
 			// virtual dependency
 			foreach ( self::$provides as $plugin => $provides ) {
-				if ( in_array( $dep, $provides ) ) {
+				if ( in_array( $dep, $provides, true ) ) {
 					$plugin_ids[] = $plugin;
 				}
 			}
@@ -187,8 +187,8 @@ class Plugin_Dependencies {
 	public static function check_activation( $plugin, $network_wide = false ) {
 		if ( true === $network_wide ) {
 			self::$active_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
-		}
-		else {
+
+		} else {
 			self::$active_plugins = get_option( 'active_plugins', array() );
 
 			if ( is_multisite() ) {
@@ -208,8 +208,8 @@ class Plugin_Dependencies {
 		if ( count( $deps ) === count( array_intersect( self::$active_plugins, $deps ) ) ) {
 			// Ok, all dependencies have been met
 			return;
-		}
-		else {
+
+		} else {
 			self::$blocked_activations[] = $plugin;
 			self::set_transient( 'activate', self::$blocked_activations, $network_wide );
 
@@ -269,7 +269,7 @@ class Plugin_Dependencies {
 	 */
 	protected static function execute_check( $type, $plugin, $network_wide = false ) {
 		remove_action( 'deactivate_plugin', array( 'Plugin_Dependencies', 'check_cascade' ) );
-		Plugin_Dependencies::init();
+		self::init();
 		self::$active_network_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
 		self::check_dependencies( $type, $plugin, $network_wide, $network_wide );
 		add_action( 'deactivate_plugin', array( 'Plugin_Dependencies', 'check_cascade' ), 10, 2 );
@@ -298,7 +298,7 @@ class Plugin_Dependencies {
 				}
 
 				$deactivated = call_user_func( array( __CLASS__, "deactivate_$type" ), (array) $plugin, false );
-				if ( $deactivated !== array() ) {
+				if ( array() !== $deactivated ) {
 					self::set_transient( $type, $deactivated, false );
 					self::add_to_recently_deactivated( $deactivated );
 					self::$deactivated_on_sites[] = get_current_blog_id();
@@ -308,20 +308,19 @@ class Plugin_Dependencies {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			/* Multi-site network (de-)activation - check plugin dependencies for each blog */
 			self::check_dependencies_for_blogs( $type, $plugin );
 
 			/* And for the network */
 			self::$active_plugins = self::$active_network_plugins;
 			$deactivated          = call_user_func( array( __CLASS__, "deactivate_$type" ), (array) $plugin, $network_wide );
-			if ( $deactivated !== array() ) {
+			if ( array() !== $deactivated ) {
 				self::set_transient( $type, $deactivated, true );
 				add_filter( 'pre_update_site_option_active_sitewide_plugins', array( __CLASS__, 'prevent_option_override_sitewide' ) );
 			}
 
-			if ( isset( self::$deactivated_on_sites ) && self::$deactivated_on_sites !== array() ) {
+			if ( isset( self::$deactivated_on_sites ) && array() !== self::$deactivated_on_sites ) {
 				self::set_transient( 'network', self::$deactivated_on_sites, true );
 			}
 		}
@@ -341,7 +340,7 @@ class Plugin_Dependencies {
 		$original_blog_id = get_current_blog_id(); // alternatively use: $wpdb->blogid
 		$all_blogs        = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
 
-		if ( is_array( $all_blogs ) && $all_blogs !== array() ) {
+		if ( is_array( $all_blogs ) && array() !== $all_blogs ) {
 			foreach ( $all_blogs as $blog_id ) {
 				switch_to_blog( $blog_id );
 				self::check_dependencies( $type, $plugin, false, true );
@@ -453,8 +452,8 @@ class Plugin_Dependencies {
 				$deactivated = array_merge( $value, $deactivated );
 			}
 			set_transient( "pd_deactivate_$type", array_unique( $deactivated ) );
-		}
-		else {
+
+		} else {
 			$value = get_site_transient( "pd_deactivate_$type" );
 			if ( is_array( $value ) ) {
 				$deactivated = array_merge( $value, $deactivated );
@@ -591,8 +590,7 @@ class Plugin_Dependencies_UI {
 				if ( ! is_network_admin() ) {
 					$deactivated = get_transient( "pd_deactivate_$type" );
 					delete_transient( "pd_deactivate_$type" );
-				}
-				else {
+				} else {
 					$deactivated = get_site_transient( "pd_deactivate_$type" );
 					delete_site_transient( "pd_deactivate_$type" );
 				}
@@ -607,8 +605,7 @@ class Plugin_Dependencies_UI {
 						array( 'class' => 'updated' ),
 						html( 'p', $text, self::generate_dep_list( $deactivated, $deactivated ) )
 					); // xss ok
-				}
-				else {
+				} else {
 					$dep_list = '';
 					$class    = 'unsatisfied';
 					foreach ( $deactivated as $blog_id ) {
@@ -652,7 +649,7 @@ class Plugin_Dependencies_UI {
 
 		$hash = array();
 		foreach ( $all_plugins as $file => $data ) {
-			$name = isset( $data['Name'] ) ? $data['Name'] : $file;
+			$name          = isset( $data['Name'] ) ? $data['Name'] : $file;
 			$hash[ $name ] = sanitize_title( $name );
 		}
 
@@ -687,11 +684,12 @@ class Plugin_Dependencies_UI {
 			return $actions;
 		}
 
-		$active_plugins = (array) get_option( 'active_plugins', array() );
+		$active_plugins         = (array) get_option( 'active_plugins', array() );
 		$network_active_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
-		$mu_plugins = array_keys( (array) get_mu_plugins() );
+		$mu_plugins             = array_keys( (array) get_mu_plugins() );
 
-		$unsatisfied = $unsatisfied_network = array();
+		$unsatisfied         = array();
+		$unsatisfied_network = array();
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
 
@@ -718,8 +716,7 @@ class Plugin_Dependencies_UI {
 			// Array key was changed in WP 3.4
 			if ( isset( $actions['network_activate'] ) ) {
 				unset( $actions['network_activate'] );
-			}
-			else {
+			} else {
 				unset( $actions['activate'] );
 			}
 			self::$unsatisfied[] = 'checkbox_' . md5( $plugin_data['Name'] );
@@ -740,15 +737,13 @@ class Plugin_Dependencies_UI {
 		$dep_list = '';
 		foreach ( $deps as $dep ) {
 			$plugin_ids = Plugin_Dependencies::get_providers( $dep );
-			if ( in_array( $dep, $unsatisfied ) ) {
+			if ( in_array( $dep, $unsatisfied, true ) ) {
 				$class = 'unsatisfied';
 				$title = __( 'Dependency: Unsatisfied', 'plugin-dependencies' );
-			}
-			elseif ( in_array( $dep, $unsatisfied_network ) ) {
+			} elseif ( in_array( $dep, $unsatisfied_network, true ) ) {
 				$class = 'unsatisfied_network';
 				$title = __( 'Dependency: Network unsatisfied', 'plugin-dependencies' );
-			}
-			else {
+			} else {
 				$class = 'satisfied';
 				$title = __( 'Dependency: Satisfied', 'plugin-dependencies' );
 			}
@@ -762,37 +757,51 @@ class Plugin_Dependencies_UI {
 						if ( is_network_admin() || ! is_plugin_active_for_network( $plugin_id ) ) {
 							$name = $all_plugins[ $plugin_id ]['Name'];
 							$url  = self_admin_url( 'plugins.php' ) . '#' . sanitize_title( $name );
-						}
-						else {
+
+						} else {
 							$name = sprintf(
-								__( '%s (%s)', 'plugin-dependencies' ),
+								/* translators: 1: Plugin name; 2: Plugin installation type (network/must-use). */
+								__( '%1$s (%2$s)', 'plugin-dependencies' ),
 								$all_plugins[ $plugin_id ]['Name'],
 								__( 'network', 'plugin-dependencies' )
 							);
 							if ( current_user_can( 'manage_network_plugins' ) ) {
 								$url  = network_admin_url( 'plugins.php' ) . '#' . sanitize_title( $all_plugins[ $plugin_id ]['Name'] );
-							}
-							else {
+							} else {
 								$url = false;
 							}
 						}
 					} elseif ( isset( $mu_plugins[ $plugin_id ]['Name'] ) ) {
 						$name = sprintf(
-							__( '%s (%s)', 'plugin-dependencies' ),
+							/* translators: 1: Plugin name; 2: Plugin installation type (network/must-use). */
+							__( '%1$s (%2$s)', 'plugin-dependencies' ),
 							$mu_plugins[ $plugin_id ]['Name'],
 							__( 'must-use', 'plugin-dependencies' )
 						);
-						$url  = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $mu_plugins[ $plugin_id ]['Name'] );
+						$url = add_query_arg( 'plugin_status', 'mustuse' ) . '#' . sanitize_title( $mu_plugins[ $plugin_id ]['Name'] );
+
 					} else {
 						$name = $plugin_id;
 						$url  = '#' . sanitize_title( $name );
 					}
 
 					if ( false !== $url ) {
-						$list[] = html( 'a', array( 'href' => $url, 'title' => $title ), $name );
-					}
-					else {
-						$list[] = html( 'span', array( 'title' => $title ), $name );
+						$list[] = html(
+							'a',
+							array(
+								'href'  => $url,
+								'title' => $title,
+							),
+							$name
+						);
+					} else {
+						$list[] = html(
+							'span',
+							array(
+								'title' => $title,
+							),
+							$name
+						);
 					}
 				}
 				$name = implode( ' or ', $list );
@@ -830,7 +839,7 @@ if ( ! function_exists( 'html' ) ) :
 			list( $closing ) = explode( ' ', $tag, 2 );
 		}
 
-		if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ) ) ) {
+		if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ), true ) ) {
 			return "<{$tag} />";
 		}
 
