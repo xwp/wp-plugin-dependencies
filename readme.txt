@@ -17,9 +17,9 @@ Example:
 
 <pre lang="php">
 /*
-Plugin Name: BuddyPress Debug
-Depends: BuddyPress, Debug Bar
-*/
+ * Plugin Name: BuddyPress Debug
+ * Depends: BuddyPress, Debug Bar
+ */
 </pre>
 
 What this does:
@@ -50,18 +50,18 @@ Say you have some useful functions that you would like to package up as a librar
 
 <pre lang="php">
 /*
-Plugin Name: Facebook Lib
-Provides: lib-facebook
-*/
+ * Plugin Name: Facebook Lib
+ * Provides: lib-facebook
+ */
 </pre>
 
 Now, dependant plugins can specify 'lib-facebook' as a dependency:
 
 <pre lang="php">
 /*
-Plugin Name: Cool Facebook Plugin
-Depends: lib-facebook
-*/
+ * Plugin Name: Cool Facebook Plugin
+ * Depends: lib-facebook
+ */
 </pre>
 
 Besides being more robust, the *Provides:* header allows multiple plugins to implement the same set of functionality and be used interchangeably.
