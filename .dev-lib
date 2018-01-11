@@ -1,0 +1,8 @@
+DEFAULT_BASE_BRANCH=develop
+PHPCS_GIT_TREE=master
+PHPCS_IGNORE='tests/*,dev-lib/*,includes/vendor/*'
+WPCS_GIT_TREE=develop
+WPCS_STANDARD=WordPress-Extra
+YUI_COMPRESSOR_CHECK=0
+CODECEPTION_CHECK=0
+CHECK_SCOPE=all
