@@ -1,0 +1,13 @@
+{
+    "name": "xwp/wp-plugin-dependencies",
+    "description": "WordPress plugin dependency management.",
+    "homepage": "https://github.com/xwp/wp-plugin-dependencies",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0",
+    "version": "1.3.0",
+    "require-dev": {
+        "wp-coding-standards/wpcs": "dev-develop",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+        "wimg/php-compatibility": "^8.1"
+    }
+}

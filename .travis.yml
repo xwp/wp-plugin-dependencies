@@ -6,6 +6,13 @@ notifications:
         on_success: never
         on_failure: change
 
+cache:
+    directories:
+        # Cache directory for older Composer versions.
+        - $HOME/.composer/cache/files
+        # Cache directory for more recent Composer versions.
+        - $HOME/.cache/composer/files
+
 language:
     - php
 
@@ -23,7 +30,7 @@ matrix:
 
     include:
         - php: 7.2
-          env: DEV_LIB_ONLY=phpsyntax,executebit,phpcs
+          env: DEV_LIB_ONLY=composer,phpsyntax,executebit,phpcs
 
 install:
     - export DEV_LIB_PATH=dev-lib
