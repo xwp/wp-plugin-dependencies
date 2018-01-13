@@ -20,6 +20,9 @@
 		<!-- Temporarily exclude this notice so this can be investigated
 			 and if necessary addressed. -->
 		<exclude name="WordPress.Security.NonceVerification.NoNonceVerification"/>
+
+		<!-- TODO: fix this (low priority). -->
+		<exclude name="Generic.Files.OneClassPerFile.MultipleFound" />
 	</rule>
 
 	<!-- The value of the below config variable should be in-line with the
