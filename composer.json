@@ -7,8 +7,8 @@
     "version": "1.3.0",
     "require-dev": {
         "xwp/wp-dev-lib": "dev-master",
-        "wp-coding-standards/wpcs": "dev-develop",
+        "wp-coding-standards/wpcs": "^1.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
-        "wimg/php-compatibility": "^8.1"
+        "phpcompatibility/phpcompatibility-wp": "^1.0"
     }
 }

@@ -62,6 +62,6 @@
 	-->
 
 	<config name="testVersion" value="5.2-"/>
-	<rule ref="PHPCompatibility"/>
+	<rule ref="PHPCompatibilityWP"/>
 
 </ruleset>
